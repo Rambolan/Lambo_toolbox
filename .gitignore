@@ -1,0 +1,19 @@
+# Ignore memory and IDE files
+.workbuddy/
+.vscode/
+.idea/
+
+# Test files
+test-*.html
+test-model.js
+
+# Large model files
+assets/ai-models/
+assets/image/
+
+# Lock file (optional, can include if needed)
+# package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
