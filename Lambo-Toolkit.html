@@ -353,73 +353,56 @@
       border-top: 1px solid var(--sidebar-border);
     }
 
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--td-size-3);
+    .feed-link {
       margin-bottom: var(--td-size-3);
-      position: relative;
+      color: var(--td-error-color);
     }
-
-    .theme-icon {
-      color: var(--sidebar-text);
-      opacity: 0.5;
-      transition: opacity 0.3s ease;
+    .feed-link .nav-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    .theme-icon.active {
       opacity: 1;
     }
-
-    html[data-theme="dark"] .sun-icon {
-      opacity: 0.3;
+    .feed-link:hover {
+      background: var(--td-error-color-light, #FFECE8);
+      color: var(--td-error-color);
+    }
+    .feed-link.active {
+      background: var(--td-error-color-light, #FFECE8);
+      color: var(--td-error-color);
+      font-weight: 600;
+    }
+    .feed-link.active::before {
+      background: var(--td-error-color);
     }
 
-    html[data-theme="dark"] .sun-icon.active {
+    .theme-link {
+      margin-bottom: var(--td-size-3);
+      color: var(--td-warning-color);
+    }
+    .theme-link .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       opacity: 1;
     }
-
-    html:not([data-theme="dark"]) .moon-icon {
-      opacity: 0.3;
+    .theme-link:hover {
+      background: var(--td-warning-color-light, #FFF7E8);
+      color: var(--td-warning-color);
     }
-
-    html:not([data-theme="dark"]) .moon-icon.active {
-      opacity: 1;
+    .theme-icon-moon,
+    .theme-label-dark {
+      display: none !important;
     }
-
-    .theme-switch {
-      width: 44px;
-      height: 24px;
-      background: var(--td-brand-color-3);
-      border-radius: 12px;
-      position: relative;
-      cursor: pointer;
-      transition: background 0.3s ease;
+    html[data-theme="dark"] .theme-icon-sun,
+    html[data-theme="dark"] .theme-label-light {
+      display: none !important;
     }
-
-    .theme-switch::before {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 20px;
-      height: 20px;
-      background: white;
-      border-radius: 50%;
-      transition: transform 0.3s cubic-bezier(0.34, 0.69, 0.1, 1);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    html[data-theme="dark"] .theme-icon-moon {
+      display: flex !important;
     }
-
-    html[data-theme="dark"] .theme-switch {
-      background: var(--td-brand-color);
-    }
-
-    html[data-theme="dark"] .theme-switch::before {
-      transform: translateX(20px);
+    html[data-theme="dark"] .theme-label-dark {
+      display: inline !important;
     }
 
     .sidebar-footer .copyright {
@@ -1455,6 +1438,48 @@
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
+    }
+
+    .site-tooltip {
+      position: fixed;
+      background: var(--color-text-1, #1D2129);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: var(--td-radius-small, 2px);
+      font-size: 12px;
+      line-height: 1.5;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10000;
+      max-width: 280px;
+      box-shadow: var(--td-shadow-2);
+      transition: opacity 0.15s cubic-bezier(0.34, 0.69, 0.1, 1);
+      white-space: normal;
+      word-break: break-all;
+    }
+    .site-tooltip.show {
+      opacity: 1;
+    }
+    .site-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--color-text-1, #1D2129);
+    }
+    .site-tooltip.tooltip-bottom::after {
+      top: 100%;
+      bottom: auto;
+      border-top-color: var(--color-text-1, #1D2129);
+      border-bottom-color: transparent;
+    }
+    .site-tooltip.tooltip-top::after {
+      top: auto;
+      bottom: 100%;
+      border-bottom-color: var(--color-text-1, #1D2129);
+      border-top-color: transparent;
     }
 
     /* Animation for stat cards on update */
@@ -4051,9 +4076,9 @@
     <div class="nav-section">
       <ul class="nav-list">
         <li class="nav-item">
-          <a class="nav-link" data-page="home" href="javascript:void(0)" onclick="switchPage('home')">
-            <span class="nav-icon">⌂</span>
-            首页
+          <a class="nav-link" data-page="site-nav" href="javascript:void(0)" onclick="switchPage('site-nav')">
+            <span class="nav-icon">🔗</span>
+            网站导航
           </a>
         </li>
         <li class="nav-item">
@@ -4097,12 +4122,6 @@
             计算器
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" data-page="site-nav" href="javascript:void(0)" onclick="switchPage('site-nav')">
-            <span class="nav-icon">🔗</span>
-            网站导航
-          </a>
-        </li>
         <li class="nav-item has-submenu" id="nav-review-parent">
           <a class="nav-link" data-page="review" href="javascript:void(0)" onclick="toggleReviewSubmenu()">
             <span class="nav-icon">◆</span>
@@ -4125,27 +4144,29 @@
     </div>
 
     <div class="sidebar-footer">
-      <div class="theme-toggle">
-        <span class="theme-icon sun-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      <a class="nav-link feed-link" data-page="home" href="javascript:void(0)" onclick="switchPage('home')">
+        <span class="nav-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21C5 16 3 12 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4-2 8-9 13z"/>
           </svg>
         </span>
-        <span class="theme-icon moon-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        投喂
+      </a>
+      <a class="nav-link theme-link" href="javascript:void(0)" onclick="toggleTheme()">
+        <span class="nav-icon theme-icon-sun">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
           </svg>
         </span>
-        <div class="theme-switch" id="themeSwitch" onclick="toggleTheme()"></div>
-      </div>
+        <span class="nav-icon theme-icon-moon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
+        <span class="theme-label-light">日间模式</span>
+        <span class="theme-label-dark">夜间模式</span>
+      </a>
       <p class="copyright">兰博的设计小摊 &copy; 2026</p>
     </div>
   </nav>
@@ -4665,6 +4686,21 @@
           </div>
 
           <div class="site-nav-category">
+            <h2 class="site-nav-category-title">实用工具</h2>
+            <div class="site-nav-grid">
+              <a class="site-nav-card" href="https://fg.vkr.me/mac" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #F7BA1E;">
+                  <span>Mac</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>浮光</h3>
+                  <p>Mac 实用工具合集</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="site-nav-category">
             <h2 class="site-nav-category-title">地图资源</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card" href="https://datav.aliyun.com/portal/school/atlas/area_selector" target="_blank" rel="noopener">
@@ -4952,6 +4988,24 @@
                   <p>在线设计平台</p>
                 </div>
               </a>
+              <a class="site-nav-card" href="https://hub.cocoloop.cn/?ref=www.pmkg.net" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #722ED1;">
+                  <span>CL</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>Cocoloop</h3>
+                  <p>CocoLoop 是当贝推出的一个 OpenClaw 类 AI Agent 技能商店，提供技能获取、安全审核与集成服务</p>
+                </div>
+              </a>
+              <a class="site-nav-card" href="https://www.xingliu.art/" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #165DFF;">
+                  <span>XL</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>星流</h3>
+                  <p>AI 图像生成工具</p>
+                </div>
+              </a>
             </div>
           </div>
         </div>
@@ -5187,9 +5241,9 @@
   <nav class="bottom-nav" id="bottomNav">
     <ul class="bottom-nav-list">
       <li class="bottom-nav-item">
-        <a class="bottom-nav-link" data-bpage="home" href="javascript:void(0)" onclick="switchPage('home')">
-          <span class="bottom-nav-icon">⌂</span>
-          首页
+        <a class="bottom-nav-link" data-bpage="site-nav" href="javascript:void(0)" onclick="switchPage('site-nav')">
+          <span class="bottom-nav-icon">🔗</span>
+          网站导航
         </a>
       </li>
       <li class="bottom-nav-item">
@@ -5234,12 +5288,6 @@
           计算器
         </a>
       </li>
-      <li class="bottom-nav-item">
-        <a class="bottom-nav-link" data-bpage="site-nav" href="javascript:void(0)" onclick="switchPage('site-nav')">
-          <span class="bottom-nav-icon">🔗</span>
-          网站导航
-        </a>
-      </li>
       <li class="bottom-nav-item last">
         <a class="bottom-nav-link" data-bpage="review" href="javascript:void(0)" onclick="switchPage('review')">
           <span class="bottom-nav-icon">◆</span>
@@ -5261,6 +5309,9 @@
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
+
+  <!-- Tooltip -->
+  <div class="site-tooltip" id="siteTooltip"></div>
 
   <script>
     const input = document.getElementById('textInput');
@@ -5511,6 +5562,58 @@
       toast.textContent = msg;
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 1600);
+    }
+
+    // Tooltip - 网站导航简介悬浮显示
+    function initSiteNavTooltip() {
+      const tooltip = document.getElementById('siteTooltip');
+      if (!tooltip) return;
+
+      const cards = document.querySelectorAll('.site-nav-card');
+      let hideTimer = null;
+
+      cards.forEach(card => {
+        const descEl = card.querySelector('.site-nav-info p');
+        if (!descEl) return;
+
+        card.addEventListener('mouseenter', (e) => {
+          const text = descEl.textContent.trim();
+          if (!text) return;
+          const isOverflowed = descEl.scrollWidth > descEl.clientWidth;
+          if (!isOverflowed) return;
+
+          clearTimeout(hideTimer);
+          tooltip.textContent = text;
+          tooltip.classList.add('show');
+
+          const cardRect = card.getBoundingClientRect();
+          const tooltipRect = tooltip.getBoundingClientRect();
+
+          let left = cardRect.left + cardRect.width / 2 - tooltipRect.width / 2;
+          let top = cardRect.top - tooltipRect.height - 10;
+
+          if (left < 8) left = 8;
+          if (left + tooltipRect.width > window.innerWidth - 8) {
+            left = window.innerWidth - tooltipRect.width - 8;
+          }
+          tooltip.classList.remove('tooltip-top', 'tooltip-bottom');
+          if (top < 8) {
+            top = cardRect.bottom + 10;
+            tooltip.classList.add('tooltip-top');
+          } else {
+            tooltip.classList.add('tooltip-bottom');
+          }
+
+          tooltip.style.left = left + 'px';
+          tooltip.style.top = top + 'px';
+        });
+
+        card.addEventListener('mouseleave', () => {
+          hideTimer = setTimeout(() => {
+            tooltip.classList.remove('show');
+          }, 100);
+        });
+      });
     }
 
     // 初始化
@@ -5845,7 +5948,9 @@
       } else if (page === 'image-compare' || page === 'review') {
         // 图片比对页面初始化
         window.udcInit && window.udcInit();
-      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress' && page !== 'site-nav') {
+      } else if (page === 'site-nav') {
+        initSiteNavTooltip();
+      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress') {
         showToast(`「${getPageName(page)}」功能开发中...`);
       }
     }
@@ -5865,7 +5970,7 @@
     }
 
     function getPageName(page) {
-      const names = { counter: '文字统计', home: '首页', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理' };
+      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理' };
       return names[page] || page;
     }
 
@@ -8768,7 +8873,7 @@
   (function(){
     if(typeof html2canvas==='undefined'){
       var s=document.createElement('script');
-      s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      s.src='html2canvas.min.js';
       s.async=false; document.head.appendChild(s);
     }
   })();
