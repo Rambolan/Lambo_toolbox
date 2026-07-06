@@ -216,6 +216,15 @@
       border-radius: var(--td-radius-medium);
       flex-shrink: 0;
     }
+    .sidebar-brand .brand-logo-dark {
+      display: none;
+    }
+    html[data-theme="dark"] .sidebar-brand .brand-logo-light {
+      display: none;
+    }
+    html[data-theme="dark"] .sidebar-brand .brand-logo-dark {
+      display: block;
+    }
     .sidebar-brand h2 {
       color: var(--sidebar-text-active);
       font-size: var(--td-font-size-title-medium);
@@ -4061,7 +4070,8 @@
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <img src="assets/image/logo.svg" class="brand-logo" alt="LB">
+      <img src="assets/image/logo.svg" class="brand-logo brand-logo-light" alt="LB">
+      <img src="assets/image/logo-dark.svg" class="brand-logo brand-logo-dark" alt="LB">
       <div>
         <h2>兰博的工具箱</h2>
         <p>实用工具集</p>
