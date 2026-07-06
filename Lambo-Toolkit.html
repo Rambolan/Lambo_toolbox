@@ -8575,7 +8575,7 @@
     function udcRepairJson(str){
       var s=str.trim();
       // 单引号 → 双引号（排除已转义的）
-      s=s.replace(/(?<!\\)'/g,'"');
+      s=s.replace(/(\\)?'/g, function(m, esc){ return esc ? m : '"'; });
       // 未加引号的键名 加引号: {key: → {"key":
       s=s.replace(/([{,]\s*)([a-zA-Z_]\w*)(\s*:)/g,'$1"$2"$3');
       // 再次清理尾部逗号
@@ -9223,7 +9223,7 @@
       var s=str.trim();
       s=s.replace(/\u201c|\u201d/g,'"');       // 中文引号 → "
       s=s.replace(/\uff1a/g,':');               // 中文冒号 → :
-      s=s.replace(/(?<!\\)'/g,'"');             // 单引号 → 双引号
+      s=s.replace(/(\\)?'/g, function(m, esc){ return esc ? m : '"'; });             // 单引号 → 双引号
       s=s.replace(/([{,]\s*)([a-zA-Z_\u4e00-\u9fa5][\w\u4e00-\u9fa5]*)(\s*:)/g,'$1"$2"$3'); // 未加引号的键
       s=s.replace(/,\s*([}\]])/g,'$1');        // 尾部逗号
       r=ccAttemptParse(s); if(r) return r;
