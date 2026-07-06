@@ -9,7 +9,6 @@ test-model.js
 
 # Large model files
 assets/ai-models/
-assets/image/
 
 # Lock file (optional, can include if needed)
 # package-lock.json
