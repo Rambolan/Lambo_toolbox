@@ -2558,6 +2558,323 @@
       .compress-settings { padding: var(--td-size-4); }
     }
 
+    /* === Video Download Page === */
+    .video-download-page {
+      padding: var(--td-size-6);
+      padding-bottom: var(--td-size-10);
+    }
+    .vd-header {
+      margin-bottom: var(--td-size-6);
+    }
+    .vd-header h1 {
+      font-size: var(--td-font-size-headline-small);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: var(--td-size-2);
+    }
+    .vd-header p {
+      font-size: var(--td-font-size-body-medium);
+      color: var(--text-secondary);
+    }
+    .vd-content {
+      max-width: 800px;
+    }
+    .vd-input-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-large);
+      padding: var(--td-size-5);
+    }
+    .vd-input-wrap {
+      position: relative;
+    }
+    .vd-url-input {
+      width: 100%;
+      padding: var(--td-size-3) var(--td-size-4);
+      padding-right: 40px;
+      font-size: var(--td-font-size-body-medium);
+      font-family: var(--td-font-family);
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-medium);
+      resize: vertical;
+      outline: none;
+      transition: var(--transition);
+    }
+    .vd-url-input::placeholder {
+      color: var(--text-muted);
+    }
+    .vd-url-input:focus {
+      border-color: var(--td-brand-color);
+      box-shadow: 0 0 0 3px var(--td-brand-color-1);
+    }
+    .vd-clear-btn {
+      position: absolute;
+      top: var(--td-size-3);
+      right: var(--td-size-3);
+      width: 24px;
+      height: 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 50%;
+      background: var(--td-bg-color-component);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .vd-clear-btn:hover {
+      background: var(--td-bg-color-component-hover);
+      color: var(--text);
+    }
+    .vd-clear-btn.show {
+      display: inline-flex;
+    }
+    .vd-action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--td-size-3);
+      margin-top: var(--td-size-4);
+      flex-wrap: wrap;
+    }
+    .vd-paste-hint {
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-muted);
+    }
+    .vd-paste-hint kbd {
+      display: inline-block;
+      padding: 1px 6px;
+      font-size: 11px;
+      font-family: var(--td-font-family);
+      color: var(--text-secondary);
+      background: var(--td-bg-color-component);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-small);
+    }
+    .vd-action-btns {
+      display: flex;
+      gap: var(--td-size-2);
+    }
+    .vd-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--td-size-2);
+      height: var(--td-comp-size-m);
+      padding: 0 var(--td-size-5);
+      font-size: var(--td-font-size-body-medium);
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-medium);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .vd-btn:hover {
+      border-color: var(--td-brand-color);
+      color: var(--td-brand-color);
+    }
+    .vd-btn-primary {
+      background: var(--td-brand-color);
+      border-color: var(--td-brand-color);
+      color: #fff;
+    }
+    .vd-btn-primary:hover {
+      background: var(--td-brand-color-hover);
+      border-color: var(--td-brand-color-hover);
+      color: #fff;
+    }
+    .vd-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .vd-preview-area {
+      margin-top: var(--td-size-5);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-large);
+      overflow: hidden;
+    }
+    .vd-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--td-size-3);
+      padding: var(--td-size-4) var(--td-size-5);
+      border-bottom: 1px solid var(--border);
+    }
+    .vd-preview-title {
+      font-size: var(--td-font-size-body-medium);
+      font-weight: 500;
+      color: var(--text);
+    }
+    .vd-preview-info {
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 60%;
+    }
+    .vd-video-wrap {
+      background: #000;
+      line-height: 0;
+    }
+    .vd-video-wrap video {
+      width: 100%;
+      max-height: 450px;
+      display: block;
+    }
+    .vd-download-actions {
+      display: flex;
+      gap: var(--td-size-3);
+      padding: var(--td-size-4) var(--td-size-5);
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .vd-download-btn {
+      flex: 1;
+      min-width: 180px;
+    }
+    .vd-open-link {
+      text-decoration: none;
+    }
+    .vd-status {
+      margin-top: var(--td-size-4);
+      padding: var(--td-size-3) var(--td-size-4);
+      border-radius: var(--td-radius-medium);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--td-size-2);
+      font-size: var(--td-font-size-body-small);
+      line-height: 1.6;
+    }
+    .vd-status.info {
+      background: var(--td-brand-color-1);
+      color: var(--td-brand-color);
+    }
+    .vd-status.warning {
+      background: var(--td-warning-color-light);
+      color: var(--td-warning-color);
+    }
+    .vd-status.error {
+      background: var(--td-error-color-light);
+      color: var(--td-error-color);
+    }
+    .vd-status.success {
+      background: var(--td-success-color-light);
+      color: var(--td-success-color);
+    }
+    .vd-status-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+    .vd-status-text {
+      flex: 1;
+    }
+    .vd-progress {
+      margin-top: var(--td-size-4);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-medium);
+      padding: var(--td-size-4);
+    }
+    .vd-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-secondary);
+      margin-bottom: var(--td-size-2);
+    }
+    .vd-progress-percent {
+      font-weight: 600;
+      color: var(--td-brand-color);
+    }
+    .vd-progress-bar {
+      height: 6px;
+      background: var(--td-bg-color-component);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .vd-progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--td-brand-color);
+      border-radius: 3px;
+      transition: width 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+    }
+    .vd-tips {
+      margin-top: var(--td-size-6);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-large);
+      padding: var(--td-size-5);
+    }
+    .vd-tips-title {
+      font-size: var(--td-font-size-body-medium);
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: var(--td-size-3);
+    }
+    .vd-tips-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .vd-tips-list li {
+      position: relative;
+      padding-left: var(--td-size-4);
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .vd-tips-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--td-brand-color);
+    }
+    .vd-tips-list code {
+      padding: 1px 5px;
+      font-size: 11px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      color: var(--td-brand-color);
+      background: var(--td-brand-color-1);
+      border-radius: var(--td-radius-small);
+    }
+    @media (max-width: 768px) {
+      .video-download-page { padding: var(--td-size-4); padding-bottom: 80px; }
+      .vd-action-row { flex-direction: column; align-items: stretch; }
+      .vd-action-btns { width: 100%; }
+      .vd-action-btns .vd-btn { flex: 1; }
+      .vd-download-actions { flex-direction: column; }
+      .vd-download-btn { width: 100%; min-width: 0; }
+    }
+    .vd-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: vd-spin 0.6s linear infinite;
+    }
+    @keyframes vd-spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* === Site Nav Page === */
     .site-nav-page {
       padding: var(--td-size-6) !important;
@@ -4150,6 +4467,12 @@
             </li>
           </ul>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" data-page="video-download" href="javascript:void(0)" onclick="switchPage('video-download')">
+            <span class="nav-icon">⬇</span>
+            视频下载
+          </a>
+        </li>
       </ul>
     </div>
 
@@ -4528,6 +4851,88 @@
         </div>
       </div>
     </div><!-- /compress-page -->
+
+      <!-- 视频下载页 -->
+      <div class="page video-download-page" id="page-video-download">
+        <div class="vd-header">
+          <h1>视频下载</h1>
+          <p>粘贴视频链接 · 在线预览 · 一键下载到本地</p>
+        </div>
+
+        <div class="vd-content">
+          <div class="vd-input-card">
+            <div class="vd-input-wrap">
+              <textarea
+                id="vdUrlInput"
+                class="vd-url-input"
+                placeholder="粘贴视频直链地址（以 .mp4 / .webm / .ogg 等结尾）&#10;例如：https://example.com/video.mp4"
+                rows="3"
+              ></textarea>
+              <button class="vd-clear-btn" id="vdClearBtn" onclick="clearVdInput()" title="清空">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div class="vd-action-row">
+              <div class="vd-paste-hint">
+                <kbd>Ctrl/⌘ + V</kbd> 粘贴链接，或直接输入
+              </div>
+              <div class="vd-action-btns">
+                <button class="vd-btn vd-btn-ghost" onclick="pasteVdUrl()">粘贴链接</button>
+                <button class="vd-btn vd-btn-primary" id="vdParseBtn" onclick="parseVdUrl()">解析视频</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="vd-preview-area" id="vdPreviewArea" style="display:none;">
+            <div class="vd-preview-header">
+              <span class="vd-preview-title">视频预览</span>
+              <span class="vd-preview-info" id="vdVideoInfo"></span>
+            </div>
+            <div class="vd-video-wrap">
+              <video id="vdVideoPlayer" controls playsinline preload="metadata"></video>
+            </div>
+            <div class="vd-download-actions">
+              <button class="vd-btn vd-btn-primary vd-download-btn" id="vdDownloadBtn" onclick="downloadVdVideo()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                下载视频到本地
+              </button>
+              <a class="vd-btn vd-btn-ghost vd-open-link" id="vdOpenLink" href="javascript:void(0)" target="_blank" rel="noopener">在新标签页打开</a>
+            </div>
+          </div>
+
+          <div class="vd-status" id="vdStatus" style="display:none;">
+            <div class="vd-status-icon" id="vdStatusIcon"></div>
+            <div class="vd-status-text" id="vdStatusText"></div>
+          </div>
+
+          <div class="vd-progress" id="vdProgress" style="display:none;">
+            <div class="vd-progress-header">
+              <span id="vdProgressText">下载中...</span>
+              <span id="vdProgressPercent">0%</span>
+            </div>
+            <div class="vd-progress-bar">
+              <div class="vd-progress-fill" id="vdProgressFill"></div>
+            </div>
+          </div>
+
+          <div class="vd-tips">
+            <div class="vd-tips-title">使用说明</div>
+            <ul class="vd-tips-list">
+              <li>支持直链视频地址（如 <code>.mp4</code>、<code>.webm</code>、<code>.ogg</code> 等格式）</li>
+              <li>输入链接后点击「解析视频」可在线预览，确认无误后点击「下载视频到本地」</li>
+              <li>下载速度取决于视频源服务器，大文件请耐心等待</li>
+              <li>部分网站因跨域限制无法直接下载，可点击「在新标签页打开」后另存</li>
+            </ul>
+          </div>
+        </div>
+      </div><!-- /video-download-page -->
 
       <!-- 长宽比例换算页 -->
       <div class="page ratio-page" id="page-ratio">
@@ -5314,6 +5719,12 @@
           代码比对
         </a>
       </li>
+      <li class="bottom-nav-item">
+        <a class="bottom-nav-link" data-bpage="video-download" href="javascript:void(0)" onclick="switchPage('video-download')">
+          <span class="bottom-nav-icon">⬇</span>
+          视频下载
+        </a>
+      </li>
     </ul>
   </nav>
 
@@ -5960,7 +6371,7 @@
         window.udcInit && window.udcInit();
       } else if (page === 'site-nav') {
         initSiteNavTooltip();
-      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress') {
+      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress' && page !== 'video-download') {
         showToast(`「${getPageName(page)}」功能开发中...`);
       }
     }
@@ -5979,8 +6390,257 @@
       if (bottomParent) bottomParent.classList.toggle('expanded');
     }
 
+    // ========== Video Download Module ==========
+    (function() {
+      const VIDEO_EXTS = /\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i;
+      let currentVideoUrl = '';
+      let downloadController = null;
+
+      const $ = (id) => document.getElementById(id);
+      const urlInput = () => $('vdUrlInput');
+      const clearBtn = () => $('vdClearBtn');
+
+      function showStatus(type, msg) {
+        const box = $('vdStatus');
+        const icon = $('vdStatusIcon');
+        const text = $('vdStatusText');
+        const icons = {
+          info: 'ℹ', warning: '⚠', error: '✕', success: '✓'
+        };
+        box.className = 'vd-status ' + type;
+        box.style.display = 'flex';
+        icon.textContent = icons[type] || '';
+        text.textContent = msg;
+      }
+
+      function hideStatus() {
+        $('vdStatus').style.display = 'none';
+      }
+
+      function hideProgress() {
+        $('vdProgress').style.display = 'none';
+        $('vdProgressFill').style.width = '0';
+        $('vdProgressPercent').textContent = '0%';
+      }
+
+      function getFileName(url) {
+        try {
+          const u = new URL(url);
+          let name = u.pathname.split('/').filter(Boolean).pop() || 'video';
+          name = name.replace(/\.[^.]+$/, '');
+          const extMatch = url.match(VIDEO_EXTS);
+          const ext = extMatch ? extMatch[1].toLowerCase() : 'mp4';
+          return name + '.' + ext;
+        } catch (e) {
+          const extMatch = url.match(VIDEO_EXTS);
+          const ext = extMatch ? extMatch[1].toLowerCase() : 'mp4';
+          return 'video.' + ext;
+        }
+      }
+
+      // 实时显示/隐藏清空按钮
+      function bindInput() {
+        const input = urlInput();
+        if (!input) return;
+        input.addEventListener('input', () => {
+          clearBtn().classList.toggle('show', input.value.trim().length > 0);
+          hideStatus();
+        });
+        input.addEventListener('keydown', (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+            e.preventDefault();
+            parseVdUrl();
+          }
+        });
+      }
+
+      // 清空输入
+      window.clearVdInput = function() {
+        urlInput().value = '';
+        clearBtn().classList.remove('show');
+        hideStatus();
+        urlInput().focus();
+      };
+
+      // 粘贴链接
+      window.pasteVdUrl = async function() {
+        const input = urlInput();
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            input.value = text.trim();
+            clearBtn().classList.add('show');
+            hideStatus();
+            showToast('已粘贴剪贴板内容');
+          } else {
+            showToast('剪贴板为空');
+          }
+        } catch (e) {
+          showToast('无法读取剪贴板，请手动粘贴');
+          input.focus();
+        }
+      };
+
+      // 解析视频链接（预览）
+      window.parseVdUrl = function() {
+        const input = urlInput();
+        const url = (input.value || '').trim();
+        hideStatus();
+
+        if (!url) {
+          showStatus('warning', '请先粘贴或输入视频链接');
+          return;
+        }
+
+        // 校验 URL
+        let validUrl;
+        try {
+          validUrl = new URL(url);
+        } catch (e) {
+          showStatus('error', '链接格式不正确，请输入完整的 http(s) 地址');
+          return;
+        }
+
+        if (validUrl.protocol !== 'http:' && validUrl.protocol !== 'https:') {
+          showStatus('error', '仅支持 http/https 协议的链接');
+          return;
+        }
+
+        currentVideoUrl = url;
+        const fileName = getFileName(url);
+        const extMatch = url.match(VIDEO_EXTS);
+        const isDirectVideo = !!extMatch;
+
+        // 设置预览
+        const video = $('vdVideoPlayer');
+        video.src = url;
+        video.load();
+
+        // 显示预览区
+        $('vdPreviewArea').style.display = 'block';
+        $('vdVideoInfo').textContent = fileName;
+        $('vdOpenLink').href = url;
+        $('vdDownloadBtn').disabled = false;
+
+        if (isDirectVideo) {
+          showStatus('info', '已识别为视频直链，可在线预览并下载');
+        } else {
+          showStatus('info', '已加载链接，若预览失败可能是非直链或受跨域限制，可尝试在新标签页打开');
+        }
+
+        // 监听视频加载错误
+        video.onerror = () => {
+          showStatus('warning', '视频预览加载失败，可能该链接不支持直接播放或受跨域限制。可点击「在新标签页打开」查看，或尝试下载');
+        };
+        video.onloadedmetadata = () => {
+          const dur = video.duration;
+          if (dur && isFinite(dur)) {
+            const m = Math.floor(dur / 60);
+            const s = Math.floor(dur % 60).toString().padStart(2, '0');
+            $('vdVideoInfo').textContent = fileName + ' · ' + m + ':' + s;
+          }
+        };
+      };
+
+      // 下载视频到本地
+      window.downloadVdVideo = async function() {
+        if (!currentVideoUrl) {
+          showStatus('warning', '请先解析视频链接');
+          return;
+        }
+        if (downloadController) {
+          showStatus('warning', '正在下载中，请稍候...');
+          return;
+        }
+
+        const btn = $('vdDownloadBtn');
+        const fileName = getFileName(currentVideoUrl);
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="vd-spinner"></span> 下载中...';
+        hideStatus();
+        $('vdProgress').style.display = 'block';
+        $('vdProgressText').textContent = '下载中...';
+
+        downloadController = new AbortController();
+
+        try {
+          const response = await fetch(currentVideoUrl, {
+            mode: 'cors',
+            signal: downloadController.signal
+          });
+
+          if (!response.ok) {
+            throw new Error('服务器返回状态码 ' + response.status);
+          }
+
+          const contentLength = response.headers.get('content-length');
+          const total = contentLength ? parseInt(contentLength, 10) : 0;
+          const reader = response.body.getReader();
+          const chunks = [];
+          let received = 0;
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            chunks.push(value);
+            received += value.length;
+            if (total > 0) {
+              const percent = Math.round((received / total) * 100);
+              $('vdProgressFill').style.width = percent + '%';
+              $('vdProgressPercent').textContent = percent + '%';
+              $('vdProgressText').textContent = '已下载 ' + formatSize(received) + ' / ' + formatSize(total);
+            } else {
+              $('vdProgressText').textContent = '已下载 ' + formatSize(received);
+              $('vdProgressFill').style.width = '100%';
+            }
+          }
+
+          const blob = new Blob(chunks);
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+          $('vdProgressText').textContent = '下载完成';
+          $('vdProgressPercent').textContent = '100%';
+          showStatus('success', '视频已开始下载到本地：' + fileName);
+          showToast('下载完成');
+        } catch (err) {
+          if (err.name === 'AbortError') {
+            showStatus('warning', '下载已取消');
+          } else {
+            hideProgress();
+            showStatus('error', '直接下载失败：' + (err.message || '未知错误') + '。该视频源可能不支持跨域访问，请点击「在新标签页打开」后右键另存为');
+          }
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 下载视频到本地';
+          downloadController = null;
+        }
+      };
+
+      function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        if (bytes < 1024 * 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + ' MB';
+        return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+      }
+
+      // 初始化绑定（延迟执行，确保 DOM 就绪）
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindInput);
+      } else {
+        bindInput();
+      }
+    })();
+
     function getPageName(page) {
-      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理' };
+      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理', 'video-download': '视频下载' };
       return names[page] || page;
     }
 
