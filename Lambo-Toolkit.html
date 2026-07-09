@@ -6542,7 +6542,44 @@
         };
       };
 
-      // 下载视频到本地
+      // CORS 代理列表（公共免费服务，按优先级排序）
+      const CORS_PROXIES = [
+        url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+        url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+      ];
+
+      // 流式下载（带进度），返回 blob
+      async function streamDownload(url, signal, onProgress) {
+        const response = await fetch(url, { mode: 'cors', signal });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const contentLength = response.headers.get('content-length');
+        const total = contentLength ? parseInt(contentLength, 10) : 0;
+        const reader = response.body.getReader();
+        const chunks = [];
+        let received = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          if (onProgress) onProgress(received, total);
+        }
+        return new Blob(chunks);
+      }
+
+      // 浏览器原生下载兜底（<a download>）
+      function nativeDownload(url, fileName) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName || 'video.mp4';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      // 下载视频到本地（三种策略：直连 → CORS代理 → 浏览器原生）
       window.downloadVdVideo = async function() {
         if (!currentVideoUrl) {
           showStatus('warning', '请先解析视频链接');
@@ -6560,43 +6597,31 @@
         btn.innerHTML = '<span class="vd-spinner"></span> 下载中...';
         hideStatus();
         $('vdProgress').style.display = 'block';
-        $('vdProgressText').textContent = '下载中...';
-
         downloadController = new AbortController();
+        const signal = downloadController.signal;
 
+        const updateProgress = (received, total) => {
+          if (total > 0) {
+            const percent = Math.round((received / total) * 100);
+            $('vdProgressFill').style.width = percent + '%';
+            $('vdProgressPercent').textContent = percent + '%';
+            $('vdProgressText').textContent = '已下载 ' + formatSize(received) + ' / ' + formatSize(total);
+          } else {
+            $('vdProgressText').textContent = '已下载 ' + formatSize(received);
+            $('vdProgressFill').style.width = '100%';
+          }
+        };
+
+        const resetBtn = () => {
+          btn.disabled = false;
+          btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 下载视频到本地';
+          downloadController = null;
+        };
+
+        // === 策略1: 直接 fetch 下载 ===
         try {
-          const response = await fetch(currentVideoUrl, {
-            mode: 'cors',
-            signal: downloadController.signal
-          });
-
-          if (!response.ok) {
-            throw new Error('服务器返回状态码 ' + response.status);
-          }
-
-          const contentLength = response.headers.get('content-length');
-          const total = contentLength ? parseInt(contentLength, 10) : 0;
-          const reader = response.body.getReader();
-          const chunks = [];
-          let received = 0;
-
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            chunks.push(value);
-            received += value.length;
-            if (total > 0) {
-              const percent = Math.round((received / total) * 100);
-              $('vdProgressFill').style.width = percent + '%';
-              $('vdProgressPercent').textContent = percent + '%';
-              $('vdProgressText').textContent = '已下载 ' + formatSize(received) + ' / ' + formatSize(total);
-            } else {
-              $('vdProgressText').textContent = '已下载 ' + formatSize(received);
-              $('vdProgressFill').style.width = '100%';
-            }
-          }
-
-          const blob = new Blob(chunks);
+          $('vdProgressText').textContent = '方式1：直连下载中...';
+          const blob = await streamDownload(currentVideoUrl, signal, updateProgress);
           const blobUrl = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = blobUrl;
@@ -6605,23 +6630,60 @@
           a.click();
           document.body.removeChild(a);
           setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-
           $('vdProgressText').textContent = '下载完成';
           $('vdProgressPercent').textContent = '100%';
           showStatus('success', '视频已开始下载到本地：' + fileName);
           showToast('下载完成');
-        } catch (err) {
-          if (err.name === 'AbortError') {
+          resetBtn();
+          return;
+        } catch (err1) {
+          if (err1.name === 'AbortError') {
             showStatus('warning', '下载已取消');
-          } else {
-            hideProgress();
-            showStatus('error', '直接下载失败：' + (err.message || '未知错误') + '。该视频源可能不支持跨域访问，请点击「在新标签页打开」后右键另存为');
+            resetBtn();
+            return;
           }
-        } finally {
-          btn.disabled = false;
-          btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 下载视频到本地';
-          downloadController = null;
         }
+
+        // === 策略2: CORS 代理下载 ===
+        for (let i = 0; i < CORS_PROXIES.length; i++) {
+          const proxyUrl = CORS_PROXIES[i](currentVideoUrl);
+          try {
+            $('vdProgressFill').style.width = '0';
+            $('vdProgressPercent').textContent = '0%';
+            $('vdProgressText').textContent = '方式2：通过代理' + (i + 1) + '下载中...';
+            showStatus('info', '直连下载受跨域限制，正在尝试通过代理' + (i + 1) + '下载...');
+
+            const blob = await streamDownload(proxyUrl, signal, updateProgress);
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+            $('vdProgressText').textContent = '下载完成';
+            $('vdProgressPercent').textContent = '100%';
+            showStatus('success', '通过代理下载成功：' + fileName);
+            showToast('下载完成');
+            resetBtn();
+            return;
+          } catch (err2) {
+            if (err2.name === 'AbortError') {
+              showStatus('warning', '下载已取消');
+              resetBtn();
+              return;
+            }
+            // 此代理失败，继续尝试下一个
+          }
+        }
+
+        // === 策略3: 浏览器原生下载兜底 ===
+        hideProgress();
+        showStatus('info', '直连与代理下载均受跨域限制，已尝试用浏览器原生方式下载。若浏览器未弹出保存提示，请点击「在新标签页打开」后右键另存为');
+        nativeDownload(currentVideoUrl, fileName);
+        showToast('已触发浏览器下载');
+        resetBtn();
       };
 
       function formatSize(bytes) {
