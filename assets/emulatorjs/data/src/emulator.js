@@ -174,20 +174,6 @@ class EmulatorJS {
         })
     }
     checkForUpdates() {
-        if (this.ejs_version.endsWith("-beta")) {
-            console.warn("Using EmulatorJS beta. Not checking for updates. This instance may be out of date. Using stable is highly recommended unless you build and ship your own cores.");
-            return;
-        }
-        fetch("https://cdn.emulatorjs.org/stable/data/version.json").then(response => {
-            if (response.ok) {
-                response.text().then(body => {
-                    let version = JSON.parse(body);
-                    if (this.versionAsInt(this.ejs_version) < this.versionAsInt(version.version)) {
-                        console.log(`Using EmulatorJS version ${this.ejs_version} but the newest version is ${version.current_version}\nopen https://github.com/EmulatorJS/EmulatorJS to update`);
-                    }
-                })
-            }
-        })
     }
     versionAsInt(ver) {
         if (ver.endsWith("-beta")) {
@@ -612,21 +598,12 @@ class EmulatorJS {
                 this.textElem.innerText = this.localization("Download Game Core") + progress;
             }, false, { responseType: "arraybuffer", method: "GET" });
             if (res === -1) {
-                console.log("File not found, attemping to fetch from emulatorjs cdn.");
-                console.error("**THIS METHOD IS A FAILSAFE, AND NOT OFFICIALLY SUPPORTED. USE AT YOUR OWN RISK**");
-                let version = this.ejs_version.endsWith("-beta") ? "nightly" : this.ejs_version;
-                res = await this.downloadFile(`https://cdn.emulatorjs.org/${version}/data/${corePath}`, (progress) => {
-                    this.textElem.innerText = this.localization("Download Game Core") + progress;
-                }, true, { responseType: "arraybuffer", method: "GET" });
-                if (res === -1) {
-                    if (!this.supportsWebgl2) {
-                        this.startGameError(this.localization("Outdated graphics driver"));
-                    } else {
-                        this.startGameError(this.localization("Error downloading core") + " (" + filename + ")");
-                    }
-                    return;
+                if (!this.supportsWebgl2) {
+                    this.startGameError(this.localization("Outdated graphics driver"));
+                } else {
+                    this.startGameError(this.localization("Error downloading core") + " (" + filename + ")");
                 }
-                console.warn("File was not found locally, but was found on the emulatorjs cdn.\nIt is recommended to download the stable release from here: https://cdn.emulatorjs.org/releases/");
+                return;
             }
             gotCore(res.data);
             this.storage.core.put(filename, {
