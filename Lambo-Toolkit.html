@@ -1,6 +1,33 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script>
+  (function() {
+    var blocked = ['preload-browserView.js', 'getThemeColors', 'exportedColors'];
+    var origError = console.error;
+    console.error = function() {
+      var msg = Array.from(arguments).join(' ');
+      for (var i = 0; i < blocked.length; i++) {
+        if (msg.indexOf(blocked[i]) !== -1) return;
+      }
+      origError.apply(console, arguments);
+    };
+    var origWarn = console.warn;
+    console.warn = function() {
+      var msg = Array.from(arguments).join(' ');
+      for (var i = 0; i < blocked.length; i++) {
+        if (msg.indexOf(blocked[i]) !== -1) return;
+      }
+      origWarn.apply(console, arguments);
+    };
+    window.addEventListener('error', function(e) {
+      var msg = e.message || '';
+      for (var i = 0; i < blocked.length; i++) {
+        if (msg.indexOf(blocked[i]) !== -1) { e.preventDefault(); return false; }
+      }
+    });
+  })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>兰博的工具箱</title>
@@ -1153,6 +1180,833 @@
       .cc-api-panel { position:fixed; left:10px; right:10px; width:auto; }
     }
 
+    /* ========== 游戏室 (Game Room) - TD Design 风格 ========== */
+    .game-room-page {
+      padding: var(--td-size-6);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .game-room-header {
+      margin-bottom: var(--td-size-7);
+    }
+    .game-room-header h1 {
+      font-size: var(--td-font-size-headline-small);
+      font-weight: 600;
+      color: var(--td-text-color-primary);
+      line-height: 1.3;
+      margin-bottom: var(--td-size-2);
+    }
+    .game-room-header p {
+      font-size: var(--td-font-size-body-medium);
+      color: var(--td-text-color-secondary);
+    }
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--td-size-5);
+    }
+    .game-card {
+      background: var(--td-bg-color-container);
+      border-radius: var(--td-radius-large);
+      border: 1px solid var(--td-border-level-2-color);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 0.69, 0.1, 1);
+      box-shadow: var(--td-shadow-1);
+    }
+    .game-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--td-shadow-3);
+      border-color: var(--td-brand-color-3);
+    }
+    .game-cover {
+      width: 100%;
+      height: 160px;
+      position: relative;
+      overflow: hidden;
+      background: var(--td-bg-color-page);
+    }
+    .game-cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .tetris-cover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tetris-cover::before {
+      content: '■';
+      font-size: 60px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 8px;
+      line-height: 1;
+    }
+    .mario-cover {
+      background: linear-gradient(135deg, #e60012 0%, #ff6b35 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mario-cover::before {
+      content: 'M';
+      font-size: 72px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.25);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1;
+    }
+    .game-cover-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s cubic-bezier(0.34, 0.69, 0.1, 1);
+    }
+    .game-card:hover .game-cover-overlay {
+      opacity: 1;
+    }
+    .game-play-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      color: var(--td-brand-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      padding-left: 4px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .game-info {
+      padding: var(--td-size-4);
+    }
+    .game-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--td-size-2);
+    }
+    .game-name {
+      font-size: var(--td-font-size-title-medium);
+      font-weight: 600;
+      color: var(--td-text-color-primary);
+      line-height: 1.4;
+    }
+    .game-type {
+      font-size: var(--td-font-size-body-small);
+      color: var(--td-brand-color);
+      background: var(--td-brand-color-light);
+      padding: 2px 8px;
+      border-radius: var(--td-radius-round);
+      font-weight: 500;
+    }
+    .game-desc {
+      font-size: var(--td-font-size-body-small);
+      color: var(--td-text-color-secondary);
+      line-height: 1.6;
+    }
+
+    /* ========== 游戏室头部加号按钮 ========== */
+    .game-room-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--td-size-4);
+      margin-bottom: var(--td-size-6);
+    }
+    .game-room-title-wrap h1 {
+      font-size: var(--td-font-size-headline-small);
+      font-weight: 600;
+      color: var(--td-text-color-primary);
+      line-height: 1.3;
+      margin-bottom: var(--td-size-2);
+    }
+    .game-room-title-wrap p {
+      font-size: var(--td-font-size-body-medium);
+      color: var(--td-text-color-secondary);
+    }
+    .game-room-add-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--td-border-level-2-color);
+      background: var(--td-bg-color-container);
+      color: var(--td-text-color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+    }
+    .game-room-add-btn:hover {
+      border-color: var(--td-brand-color);
+      background: var(--td-brand-color-light);
+      color: var(--td-brand-color);
+    }
+    .game-room-add-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* ========== 游戏导入弹窗 ========== */
+    .game-import-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s cubic-bezier(0.34, 0.69, 0.1, 1);
+      padding: var(--td-size-4);
+    }
+    .game-import-modal.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .game-import-modal-content {
+      width: 100%;
+      max-width: 520px;
+      background: var(--td-bg-color-container);
+      border-radius: var(--td-radius-large);
+      box-shadow: var(--td-shadow-3);
+      padding: var(--td-size-5);
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.34, 0.69, 0.1, 1);
+    }
+    .game-import-modal.open .game-import-modal-content {
+      transform: scale(1);
+    }
+    .game-import-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--td-size-4);
+    }
+    .game-import-modal-header h2 {
+      font-size: var(--td-font-size-title-large);
+      font-weight: 600;
+      color: var(--td-text-color-primary);
+    }
+    .game-import-modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--td-text-color-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+    }
+    .game-import-modal-close:hover {
+      background: var(--td-bg-color-component);
+      color: var(--td-text-color-primary);
+    }
+    .game-import-desc {
+      font-size: var(--td-font-size-body-medium);
+      color: var(--td-text-color-secondary);
+      margin-bottom: var(--td-size-5);
+    }
+    .game-import-dropzone {
+      border: 2px dashed var(--td-border-level-2-color);
+      border-radius: var(--td-radius-large);
+      padding: var(--td-size-7) var(--td-size-5);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 0.69, 0.1, 1);
+      background: var(--td-bg-color-container);
+    }
+    .game-import-dropzone:hover,
+    .game-import-dropzone.dragover {
+      border-color: var(--td-brand-color);
+      background: var(--td-brand-color-light);
+    }
+    .game-import-icon {
+      color: var(--td-brand-color);
+      margin-bottom: var(--td-size-3);
+    }
+    .game-import-hint {
+      font-size: var(--td-font-size-body-medium);
+      color: var(--td-text-color-primary);
+      margin-bottom: var(--td-size-2);
+    }
+    .game-import-formats {
+      font-size: var(--td-font-size-body-small);
+      color: var(--td-text-color-placeholder);
+      letter-spacing: 2px;
+    }
+
+    /* ========== 模拟器页面 (Emulator) - 掌机皮肤 ========== */
+    .emulator-page {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      background: var(--td-bg-color-page);
+      position: relative;
+    }
+    .emulator-page .ejs_loading_text,
+    .emulator-page .ejs_error_text,
+    .emulator-page .ejs_start_button,
+    .emulator-page .ejs_start_button_border,
+    .emulator-page .ejs_game_background,
+    .emulator-page .ejs_ad_iframe {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+    .emulator-back-btn {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 100;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      border: none;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+      padding: 0;
+    }
+    .emulator-back-btn:hover {
+      background: rgba(0,0,0,0.75);
+      transform: scale(1.05);
+    }
+    .emulator-title {
+      display: none;
+    }
+    .emulator-skin {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .skin-bg {
+      width: 100%;
+      display: block;
+      pointer-events: none;
+    }
+    .skin-screen {
+      position: absolute;
+      top: 15.5%;
+      left: 6.5%;
+      width: 87%;
+      height: 30%;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #emulatorGame {
+      width: 100%;
+      height: 100%;
+    }
+    #emulatorGame canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    .skin-btn {
+      position: absolute;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.05s ease;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .skin-btn:active {
+      transform: scale(0.92);
+    }
+    .skin-l {
+      top: 55%;
+      left: 5%;
+      width: 23%;
+      height: auto;
+    }
+    .skin-r {
+      top: 55%;
+      right: 5%;
+      width: 23%;
+      height: auto;
+    }
+    .skin-dpad {
+      position: absolute;
+      top: 66%;
+      left: 5%;
+      width: 40%;
+      height: auto;
+    }
+    .skin-dpad img {
+      width: 100%;
+      height: auto;
+      pointer-events: none;
+      display: block;
+    }
+    .dpad-zone {
+      position: absolute;
+      width: 34%;
+      height: 34%;
+      cursor: pointer;
+    }
+    .dpad-up { top: 0; left: 33%; }
+    .dpad-down { bottom: 0; left: 33%; }
+    .dpad-left { top: 33%; left: 0; }
+    .dpad-right { top: 33%; right: 0; }
+    .skin-x {
+      top: 65.5%;
+      right: 18%;
+      width: 17.5%;
+      height: auto;
+    }
+    .skin-y {
+      top: 71.5%;
+      right: 33%;
+      width: 17.5%;
+      height: auto;
+    }
+    .skin-a {
+      top: 71.5%;
+      right: 4%;
+      width: 17.5%;
+      height: auto;
+    }
+    .skin-b {
+      top: 77.5%;
+      right: 18%;
+      width: 17.5%;
+      height: auto;
+    }
+    .skin-menu {
+      top: 90.5%;
+      left: 5%;
+      width: 20%;
+      height: auto;
+    }
+    .skin-select {
+      top: 90.5%;
+      left: 50%;
+      width: 22%;
+      height: auto;
+    }
+    .skin-start {
+      top: 90.5%;
+      right: 5%;
+      width: 20%;
+      height: auto;
+    }
+
+    @media(max-width:768px){
+      .game-import-dropzone {
+        padding: var(--td-size-5) var(--td-size-4);
+      }
+    }
+
+    /* ========== 俄罗斯方块 (Tetris) - TD Design 风格 ========== */
+    .tetris-page {
+      padding: var(--td-size-5);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .tetris-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--td-size-5);
+      gap: var(--td-size-3);
+    }
+    .tetris-title {
+      font-size: var(--td-font-size-title-large);
+      font-weight: 600;
+      color: var(--td-text-color-primary);
+      line-height: 1.3;
+      flex: 1;
+      text-align: center;
+      margin: 0;
+    }
+    .tetris-top-spacer {
+      width: 72px;
+      flex-shrink: 0;
+    }
+    .tetris-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--td-size-2);
+      padding: 0 var(--td-size-4);
+      height: var(--td-comp-size-m);
+      border: 1px solid var(--td-border-level-2-color);
+      border-radius: var(--td-radius-medium);
+      background: var(--td-bg-color-container);
+      font-size: var(--td-font-size-body-medium);
+      color: var(--td-text-color-primary);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+    }
+    .tetris-back-btn:hover {
+      border-color: var(--td-brand-color);
+      color: var(--td-brand-color);
+      background: var(--td-brand-color-light);
+    }
+
+    /* 主区域：屏幕 + 右侧 4 个信息卡 */
+    .tetris-main-area {
+      display: flex;
+      gap: var(--td-size-4);
+      align-items: stretch;
+      margin-bottom: var(--td-size-5);
+    }
+    .tetris-screen {
+      position: relative;
+      flex: 0 0 auto;
+      width: 420px;
+      border: 2px solid var(--td-border-level-2-color);
+      border-radius: var(--td-radius-large);
+      overflow: hidden;
+      background: #0F1419;
+      box-shadow: var(--td-shadow-2);
+    }
+    #tetrisCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .tetris-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 20, 25, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .tetris-overlay.hidden {
+      display: none;
+    }
+    .tetris-overlay-content {
+      text-align: center;
+      color: #fff;
+      padding: 0 var(--td-size-4);
+    }
+    .tetris-overlay-content h2 {
+      font-size: var(--td-font-size-headline-small);
+      font-weight: 700;
+      margin-bottom: var(--td-size-3);
+    }
+    .tetris-overlay-content p {
+      font-size: var(--td-font-size-body-medium);
+      opacity: 0.8;
+      margin-bottom: var(--td-size-5);
+    }
+    .tetris-start-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 var(--td-size-7);
+      height: 44px;
+      border: none;
+      border-radius: var(--td-radius-medium);
+      background: var(--td-brand-color);
+      color: #fff;
+      font-size: var(--td-font-size-body-large);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+    }
+    .tetris-start-btn:hover {
+      background: var(--td-brand-color-hover);
+    }
+    .tetris-start-btn:active {
+      background: var(--td-brand-color-active);
+    }
+
+    /* 右侧信息卡列 */
+    .tetris-side-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--td-size-3);
+      min-width: 0;
+    }
+    .tetris-info-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--td-bg-color-container);
+      border: 1px solid var(--td-border-level-2-color);
+      border-radius: var(--td-radius-large);
+      box-shadow: var(--td-shadow-1);
+      padding: var(--td-size-2) var(--td-size-3);
+      min-height: 48px;
+    }
+    .tetris-info-label {
+      font-size: var(--td-font-size-body-small);
+      color: var(--td-text-color-secondary);
+      margin-bottom: var(--td-size-1);
+    }
+    .tetris-info-value {
+      font-size: var(--td-font-size-title-large);
+      font-weight: 700;
+      color: var(--td-brand-color);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .tetris-pause-card {
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+      border: 1px solid var(--td-border-level-2-color);
+      font-family: inherit;
+    }
+    .tetris-pause-card:hover {
+      border-color: var(--td-brand-color);
+      background: var(--td-brand-color-light);
+    }
+    .tetris-pause-card:active {
+      background: var(--td-brand-color-1);
+    }
+    .tetris-pause-icon {
+      font-size: 18px;
+      margin-bottom: 2px;
+      color: var(--td-brand-color);
+    }
+    .tetris-pause-text {
+      font-size: var(--td-font-size-body-small);
+      color: var(--td-text-color-primary);
+      font-weight: 500;
+    }
+
+    /* 底部控制区：左侧方向键 + 右侧快速落下 */
+    .tetris-controls-area {
+      display: flex;
+      gap: var(--td-size-4);
+      align-items: stretch;
+      justify-content: space-between;
+      padding: var(--td-size-4);
+      background: var(--td-bg-color-container);
+      border: 1px solid var(--td-border-level-2-color);
+      border-radius: var(--td-radius-large);
+      box-shadow: var(--td-shadow-1);
+    }
+    .tetris-dpad {
+      display: flex;
+      flex-direction: column;
+      gap: var(--td-size-2);
+      flex: 0 0 auto;
+    }
+    .tetris-dpad-row {
+      display: flex;
+      gap: var(--td-size-2);
+      align-items: center;
+      justify-content: center;
+    }
+    .tetris-dpad-cell {
+      width: 64px;
+      height: 64px;
+    }
+    .tetris-circ-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid var(--td-border-level-2-color);
+      background: var(--td-bg-color-component);
+      color: var(--td-text-color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.34, 0.69, 0.1, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0;
+    }
+    .tetris-circ-btn:hover {
+      border-color: var(--td-brand-color);
+      color: var(--td-brand-color);
+    }
+    .tetris-circ-btn:active {
+      background: var(--td-brand-color-light);
+      border-color: var(--td-brand-color);
+      color: var(--td-brand-color);
+      transform: scale(0.95);
+    }
+    .tetris-rotate-btn {
+      color: var(--td-brand-color);
+    }
+    .tetris-drop-btn {
+      flex: 0 0 auto;
+      width: 120px;
+      border-radius: 50%;
+      border: 2px solid var(--td-brand-color);
+      background: var(--td-brand-color-light);
+      color: var(--td-brand-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      aspect-ratio: 1 / 1;
+      align-self: center;
+    }
+    .tetris-drop-btn:hover {
+      background: var(--td-brand-color);
+      color: #fff;
+    }
+    .tetris-drop-btn:active {
+      background: var(--td-brand-color-active);
+      border-color: var(--td-brand-color-active);
+      transform: scale(0.97);
+    }
+    .tetris-drop-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+    .tetris-drop-text {
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    @media(max-width:768px){
+      .game-room-page {
+        padding: var(--td-size-4);
+      }
+      .game-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: var(--td-size-3);
+      }
+      .game-cover {
+        height: 120px;
+      }
+      .tetris-page {
+        padding: var(--td-size-3);
+      }
+      .tetris-top-bar {
+        margin-bottom: var(--td-size-4);
+      }
+      .tetris-title {
+        font-size: var(--td-font-size-title-medium);
+      }
+      .tetris-top-spacer {
+        width: 60px;
+      }
+      .tetris-back-btn {
+        padding: 0 var(--td-size-3);
+        font-size: var(--td-font-size-body-small);
+      }
+      .tetris-main-area {
+        gap: var(--td-size-3);
+        margin-bottom: var(--td-size-4);
+      }
+      .tetris-screen {
+        width: 260px;
+        border-radius: var(--td-radius-medium);
+      }
+      .tetris-info-card {
+        min-height: 50px;
+        padding: var(--td-size-2) var(--td-size-2);
+      }
+      .tetris-info-label {
+        font-size: var(--td-font-size-body-small);
+      }
+      .tetris-info-value {
+        font-size: var(--td-font-size-title-large);
+      }
+      .tetris-pause-icon {
+        font-size: 18px;
+      }
+      .tetris-pause-text {
+        font-size: var(--td-font-size-body-small);
+      }
+      .tetris-controls-area {
+        padding: var(--td-size-3);
+        gap: var(--td-size-3);
+      }
+      .tetris-dpad-cell {
+        width: 52px;
+        height: 52px;
+      }
+      .tetris-circ-btn {
+        width: 52px;
+        height: 52px;
+      }
+      .tetris-circ-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+      .tetris-drop-btn {
+        width: 90px;
+      }
+      .tetris-drop-icon {
+        font-size: 20px;
+      }
+      .tetris-drop-text {
+        font-size: 10px;
+      }
+    }
+
+    @media(max-width:380px){
+      .tetris-screen {
+        width: 200px;
+      }
+      .tetris-info-value {
+        font-size: var(--td-font-size-title-medium);
+      }
+      .tetris-dpad-cell {
+        width: 44px;
+        height: 44px;
+      }
+      .tetris-circ-btn {
+        width: 44px;
+        height: 44px;
+      }
+      .tetris-circ-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .tetris-drop-btn {
+        width: 80px;
+      }
+    }
+
     /* Detail Stats - TD Design Style */
     .detail-section {
       margin-top: var(--td-size-5);
@@ -1449,46 +2303,41 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    .site-tooltip {
+    /* 设计资源 - 功能介绍简单 Tooltip */
+    .site-feature-tooltip {
       position: fixed;
-      background: var(--color-text-1, #1D2129);
+      background: #1D2129;
       color: #fff;
-      padding: 6px 10px;
-      border-radius: var(--td-radius-small, 2px);
-      font-size: 12px;
-      line-height: 1.5;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.6;
       opacity: 0;
       pointer-events: none;
-      z-index: 10000;
-      max-width: 280px;
-      box-shadow: var(--td-shadow-2);
+      z-index: 10001;
+      width: 280px;
+      max-width: calc(100vw - 16px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       transition: opacity 0.15s cubic-bezier(0.34, 0.69, 0.1, 1);
-      white-space: normal;
       word-break: break-all;
     }
-    .site-tooltip.show {
+    .site-feature-tooltip.show {
       opacity: 1;
     }
-    .site-tooltip::after {
+    .site-feature-tooltip::after {
       content: '';
       position: absolute;
-      top: 100%;
       left: 50%;
       transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: var(--color-text-1, #1D2129);
+      border: 6px solid transparent;
     }
-    .site-tooltip.tooltip-bottom::after {
+    .site-feature-tooltip.tooltip-bottom::after {
       top: 100%;
-      bottom: auto;
-      border-top-color: var(--color-text-1, #1D2129);
-      border-bottom-color: transparent;
+      border-top-color: #1D2129;
     }
-    .site-tooltip.tooltip-top::after {
-      top: auto;
+    .site-feature-tooltip.tooltip-top::after {
       bottom: 100%;
-      border-bottom-color: var(--color-text-1, #1D2129);
-      border-top-color: transparent;
+      border-bottom-color: #1D2129;
     }
 
     /* Animation for stat cards on update */
@@ -2556,6 +3405,285 @@
     @media (max-width: 768px) {
       .compress-page { padding: var(--td-size-4); padding-bottom: 80px; }
       .compress-settings { padding: var(--td-size-4); }
+    }
+
+    /* ========== Page: Convert (图片格式转换) ========== */
+    .convert-page {
+      padding: var(--td-size-6);
+      padding-bottom: var(--td-size-10);
+    }
+    .convert-header {
+      margin-bottom: var(--td-size-6);
+    }
+    .convert-header h1 {
+      font-size: var(--td-font-size-headline-small);
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: var(--td-size-2);
+    }
+    .convert-header p {
+      font-size: var(--td-font-size-body-medium);
+      color: var(--text-secondary);
+    }
+    .convert-content {
+      max-width: 800px;
+    }
+    .convert-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--td-radius-large);
+      padding: var(--td-size-10) var(--td-size-6);
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--card-bg);
+    }
+    .convert-upload-area:hover {
+      border-color: var(--td-brand-color);
+      background: var(--td-brand-color-1);
+    }
+    .convert-upload-area.dragover {
+      border-color: var(--td-brand-color);
+      background: var(--td-brand-color-1);
+      transform: scale(1.01);
+    }
+    .convert-upload-icon {
+      color: var(--text-muted);
+      margin-bottom: var(--td-size-4);
+    }
+    .convert-upload-text {
+      font-size: var(--td-font-size-body-large);
+      color: var(--text);
+      margin-bottom: var(--td-size-2);
+    }
+    .convert-upload-hint {
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-muted);
+    }
+    .convert-settings {
+      margin-top: var(--td-size-6);
+      background: var(--card-bg);
+      border: var(--border-1);
+      border-radius: var(--td-radius-large);
+      padding: var(--td-size-6);
+    }
+    .convert-setting-item {
+      margin-bottom: var(--td-size-5);
+    }
+    .convert-setting-item:last-child {
+      margin-bottom: 0;
+    }
+    .convert-setting-item label {
+      display: block;
+      font-size: var(--td-font-size-body-medium);
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: var(--td-size-3);
+    }
+    .convert-quality-tip {
+      font-size: var(--td-font-size-body-small);
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .convert-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--td-size-4);
+    }
+    .convert-slider {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--td-bg-color-component);
+      border-radius: 2px;
+      outline: none;
+    }
+    .convert-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--td-brand-color);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .convert-slider::-webkit-slider-thumb:hover {
+      background: var(--td-brand-color-hover);
+      transform: scale(1.1);
+    }
+    .convert-quality-value {
+      font-size: var(--td-font-size-body-medium);
+      font-weight: 600;
+      color: var(--td-brand-color);
+      min-width: 48px;
+      text-align: right;
+    }
+    .convert-format-group {
+      display: flex;
+      gap: var(--td-size-2);
+      flex-wrap: wrap;
+    }
+    .convert-format-btn {
+      padding: var(--td-size-2) var(--td-size-4);
+      font-size: var(--td-font-size-body-small);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-medium);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .convert-format-btn:hover {
+      border-color: var(--td-brand-color);
+      color: var(--td-brand-color);
+    }
+    .convert-format-btn.active {
+      background: var(--td-brand-color);
+      border-color: var(--td-brand-color);
+      color: #fff;
+    }
+    .convert-preview-area {
+      margin-top: var(--td-size-6);
+      background: var(--card-bg);
+      border: var(--border-1);
+      border-radius: var(--td-radius-large);
+      overflow: hidden;
+    }
+    .convert-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--td-size-4) var(--td-size-5);
+      border-bottom: 1px solid var(--border);
+      font-size: var(--td-font-size-body-medium);
+      font-weight: 500;
+      color: var(--text);
+    }
+    .convert-clear-btn {
+      padding: var(--td-size-1) var(--td-size-3);
+      font-size: var(--td-font-size-body-small);
+      border: 1px solid var(--td-error-color);
+      border-radius: var(--td-radius-small);
+      background: transparent;
+      color: var(--td-error-color);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .convert-clear-btn:hover {
+      background: var(--td-error-color);
+      color: #fff;
+    }
+    .convert-preview-list {
+      max-height: 400px;
+      overflow-y: auto;
+      padding: var(--td-size-3);
+    }
+    .convert-item {
+      display: flex;
+      align-items: center;
+      gap: var(--td-size-4);
+      padding: var(--td-size-3);
+      border-radius: var(--td-radius-medium);
+      margin-bottom: var(--td-size-2);
+      background: var(--td-bg-color-component);
+    }
+    .convert-item:last-child {
+      margin-bottom: 0;
+    }
+    .convert-item-thumb {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: var(--td-radius-small);
+      background: var(--td-bg-color-component-hover);
+    }
+    .convert-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .convert-item-name {
+      font-size: var(--td-font-size-body-small);
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .convert-item-size {
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .convert-item-status {
+      font-size: var(--td-font-size-body-small);
+      font-weight: 500;
+    }
+    .convert-item-status.pending { color: var(--text-muted); }
+    .convert-item-status.processing { color: var(--td-brand-color); }
+    .convert-item-status.done { color: var(--td-success-color); }
+    .convert-item-status.error { color: var(--td-error-color); }
+    .convert-item-action {
+      padding: var(--td-size-1) var(--td-size-3);
+      font-size: var(--td-font-size-body-small);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-small);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .convert-item-action:hover {
+      border-color: var(--td-brand-color);
+      color: var(--td-brand-color);
+    }
+    .convert-item-action.download-btn {
+      background: var(--td-brand-color);
+      border-color: var(--td-brand-color);
+      color: #fff;
+    }
+    .convert-item-action.download-btn:hover {
+      background: var(--td-brand-color-hover);
+    }
+    .convert-actions {
+      padding: var(--td-size-4) var(--td-size-5);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: var(--td-size-4);
+    }
+    .convert-action-btn {
+      padding: 0 var(--td-size-8);
+      height: var(--td-comp-size-m);
+      font-size: var(--td-font-size-body-medium);
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-medium);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .convert-action-btn:hover {
+      border-color: var(--td-brand-color);
+      color: var(--td-brand-color);
+    }
+    .convert-action-btn.primary {
+      background: var(--td-brand-color);
+      border-color: var(--td-brand-color);
+      color: #fff;
+    }
+    .convert-action-btn.primary:hover {
+      background: var(--td-brand-color-hover);
+    }
+    .convert-action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    @media (max-width: 768px) {
+      .convert-page { padding: var(--td-size-4); padding-bottom: 80px; }
+      .convert-settings { padding: var(--td-size-4); }
     }
 
     /* === Video Download Page === */
@@ -4387,6 +5515,8 @@
     }
   }
   </script>
+  <!-- JSZip 用于批量打包下载（本地） -->
+  <script src="jszip.min.js"></script>
 </head>
 <body>
   <!-- Sidebar -->
@@ -4435,6 +5565,11 @@
                 图片压缩
               </a>
             </li>
+            <li class="submenu-item">
+              <a class="submenu-link" data-page="convert" href="javascript:void(0)" onclick="switchPage('convert')">
+                格式转换
+              </a>
+            </li>
           </ul>
         </li>
         <li class="nav-item">
@@ -4471,6 +5606,12 @@
           <a class="nav-link" data-page="video-download" href="javascript:void(0)" onclick="switchPage('video-download')">
             <span class="nav-icon">⬇</span>
             视频下载
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-page="game-room" href="javascript:void(0)" onclick="switchPage('game-room')">
+            <span class="nav-icon">🎮</span>
+            游戏室
           </a>
         </li>
       </ul>
@@ -4831,7 +5972,7 @@
             <label>缩放比例</label>
             <div class="compress-scale-group">
               <button class="compress-scale-btn" data-scale="0.25">25%</button>
-              <button class="compress-scale-btn active" data-scale="0.5">50%</button>
+              <button class="compress-scale-btn" data-scale="0.5">50%</button>
               <button class="compress-scale-btn" data-scale="0.75">75%</button>
               <button class="compress-scale-btn active" data-scale="1">原尺寸</button>
             </div>
@@ -4851,6 +5992,59 @@
         </div>
       </div>
     </div><!-- /compress-page -->
+
+    <!-- 图片格式转换页 -->
+    <div class="page convert-page" id="page-convert">
+      <div class="convert-header">
+        <h1>图片格式转换</h1>
+        <p>支持 PNG / JPG / WebP / GIF / BMP / SVG 输入 · 批量转换 · 单独或打包下载</p>
+      </div>
+
+      <div class="convert-content">
+        <div class="convert-upload-area" id="convertUploadArea" onclick="document.getElementById('convertFileInput').click()">
+          <div class="convert-upload-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <p class="convert-upload-text">点击上传图片或将图片拖拽到此处</p>
+          <p class="convert-upload-hint">支持 PNG / JPG / WebP / GIF / BMP / SVG · 可批量上传</p>
+          <input type="file" id="convertFileInput" accept="image/*" multiple style="display:none">
+        </div>
+
+        <div class="convert-settings">
+          <div class="convert-setting-item">
+            <label>输出格式</label>
+            <div class="convert-format-group">
+              <button class="convert-format-btn active" data-format="png">PNG</button>
+              <button class="convert-format-btn" data-format="jpeg">JPG</button>
+              <button class="convert-format-btn" data-format="webp">WebP</button>
+            </div>
+          </div>
+          <div class="convert-setting-item" id="convertQualityWrap" style="display:none;">
+            <label>输出质量 <span class="convert-quality-tip">（仅 JPG / WebP 有效）</span></label>
+            <div class="convert-slider-wrap">
+              <input type="range" id="convertQuality" min="10" max="100" value="100" class="convert-slider">
+              <span class="convert-quality-value" id="convertQualityValue">100%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="convert-preview-area" id="convertPreviewArea" style="display:none;">
+          <div class="convert-preview-header">
+            <span>预览 (<span id="convertCount">0</span> 张)</span>
+            <button class="convert-clear-btn" onclick="clearConvertList()">清空列表</button>
+          </div>
+          <div class="convert-preview-list" id="convertPreviewList"></div>
+          <div class="convert-actions">
+            <button class="convert-action-btn primary" id="convertStartBtn" onclick="startConvert()">开始转换</button>
+            <button class="convert-action-btn" id="convertDownloadAllBtn" onclick="downloadAllConvert()" style="display:none;">打包下载 ZIP</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /convert-page -->
 
       <!-- 视频下载页 -->
       <div class="page video-download-page" id="page-video-download">
@@ -5019,7 +6213,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">设计资源</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://www.figma.com" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="figma" href="https://www.figma.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #F24E1E;">
                   <span>F</span>
                 </div>
@@ -5028,7 +6222,7 @@
                   <p>协作式 UI 设计工具</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://dribbble.com" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="dribbble" href="https://dribbble.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #EA4C89;">
                   <span>D</span>
                 </div>
@@ -5037,7 +6231,7 @@
                   <p>设计师作品展示平台</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.behance.net" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="behance" href="https://www.behance.net" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #1769FF;">
                   <span>Be</span>
                 </div>
@@ -5046,7 +6240,7 @@
                   <p>创意作品展示平台</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.iconfont.cn" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="iconfont" href="https://www.iconfont.cn" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #FF6A00;">
                   <span>字</span>
                 </div>
@@ -5055,13 +6249,22 @@
                   <p>阿里巴巴矢量图标库</p>
                 </div>
               </a>
+              <a class="site-nav-card site-feature-card" data-site="iconsax" href="https://iconsax.io" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #7C3AED;">
+                  <span>I</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>Iconsax</h3>
+                  <p>高质量矢量图标库</p>
+                </div>
+              </a>
             </div>
           </div>
 
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">开发工具</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://github.com" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="github" href="https://github.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #24292E;">
                   <span>Git</span>
                 </div>
@@ -5070,7 +6273,7 @@
                   <p>全球最大代码托管平台</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://stackoverflow.com" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="stackoverflow" href="https://stackoverflow.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #F48024;">
                   <span>SO</span>
                 </div>
@@ -5079,7 +6282,7 @@
                   <p>程序员问答社区</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://codepen.io" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="codepen" href="https://codepen.io" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #000000;">
                   <span>CP</span>
                 </div>
@@ -5088,7 +6291,7 @@
                   <p>前端代码演示平台</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://developer.mozilla.org" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="mdn" href="https://developer.mozilla.org" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #000000;">
                   <span>MDN</span>
                 </div>
@@ -5103,7 +6306,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">实用工具</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://fg.vkr.me/mac" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="fuguang" href="https://fg.vkr.me/mac" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #F7BA1E;">
                   <span>Mac</span>
                 </div>
@@ -5118,7 +6321,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">地图资源</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://datav.aliyun.com/portal/school/atlas/area_selector" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="aliyun-datav" href="https://datav.aliyun.com/portal/school/atlas/area_selector" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #FF6A00;">
                   <span>云</span>
                 </div>
@@ -5127,7 +6330,7 @@
                   <p>省市行政区 SVG 下载</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://xiangyuecn.gitee.io/areacity-jsspider-statsgov/assets/geo-echarts.html" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="echarts-map" href="https://xiangyuecn.gitee.io/areacity-jsspider-statsgov/assets/geo-echarts.html" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #5470C6;">
                   <span>EC</span>
                 </div>
@@ -5136,7 +6339,7 @@
                   <p>县乡镇街道级 SVG</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.poi86.com/poi/amap.html" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="poi86" href="https://www.poi86.com/poi/amap.html" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #4F9DDF;">
                   <span>86</span>
                 </div>
@@ -5145,7 +6348,7 @@
                   <p>细颗粒度区县地图</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.mapbox.com/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="mapbox" href="https://www.mapbox.com/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #000000;">
                   <span>M</span>
                 </div>
@@ -5160,7 +6363,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">图表资源</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://echarts.apache.org/examples/zh/index.html#chart-type-line" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="echart" href="https://echarts.apache.org/examples/zh/index.html#chart-type-line" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #AA344D;">
                   <span>EC</span>
                 </div>
@@ -5175,7 +6378,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">图片处理</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://www.remove.bg/zh" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="removebg" href="https://www.remove.bg/zh" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #5C6CFF;">
                   <span>RB</span>
                 </div>
@@ -5184,7 +6387,7 @@
                   <p>背景抠图工具</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://img.logosc.cn/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="online-ps" href="https://img.logosc.cn/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #FF6A00;">
                   <span>PS</span>
                 </div>
@@ -5193,7 +6396,7 @@
                   <p>在线图片编辑器</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://snapedit.app/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="snapedit" href="https://snapedit.app/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #2563EB;">
                   <span>SE</span>
                 </div>
@@ -5202,7 +6405,7 @@
                   <p>AI 人工智能照片编辑器</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://newprofilepic.com/zh" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="newprofilepic" href="https://newprofilepic.com/zh" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #8B5CF6;">
                   <span>NP</span>
                 </div>
@@ -5211,7 +6414,7 @@
                   <p>头像制作工具</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://hzl.rzzx.com.cn/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="zjzp" href="https://hzl.rzzx.com.cn/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #00B42A;">
                   <span>证</span>
                 </div>
@@ -5220,7 +6423,7 @@
                   <p>证件照质量检测中心</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://tinypng.com/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="tinypng" href="https://tinypng.com/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #1E73BE;">
                   <span>TP</span>
                 </div>
@@ -5235,7 +6438,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">设计导航</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://hao.uisdc.com/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="uisdc" href="https://hao.uisdc.com/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #FF3B30;">
                   <span>优</span>
                 </div>
@@ -5244,7 +6447,7 @@
                   <p>设计师网站导航</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://ai-bot.cn/sites/6622.html" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="aibot" href="https://ai-bot.cn/sites/6622.html" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #6366F1;">
                   <span>AI</span>
                 </div>
@@ -5253,7 +6456,7 @@
                   <p>AI 工具导航</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.huisezhizhao.com/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="huisezhizhao" href="https://www.huisezhizhao.com/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #6B7280;">
                   <span>灰</span>
                 </div>
@@ -5262,7 +6465,7 @@
                   <p>设计资源导航</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.xiaozhongjishu.com/?from=itab" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="xiaozhongjishu" href="https://www.xiaozhongjishu.com/?from=itab" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #14C9C9;">
                   <span>技</span>
                 </div>
@@ -5271,7 +6474,7 @@
                   <p>小众技术导航</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="http://hao.shejidaren.com/book.html" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="shejidaren-book" href="http://hao.shejidaren.com/book.html" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #D91AD9;">
                   <span>书</span>
                 </div>
@@ -5286,7 +6489,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">样机包装</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://www.pacdora.cn/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="pacdora" href="https://www.pacdora.cn/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #165DFF;">
                   <span>PD</span>
                 </div>
@@ -5295,7 +6498,7 @@
                   <p>免费样机/模型在线生成器</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.baoxiaohe.com/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="baoxiaohe" href="https://www.baoxiaohe.com/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #FF7D00;">
                   <span>盒</span>
                 </div>
@@ -5304,7 +6507,7 @@
                   <p>在线包装印刷设计工具</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.mockupworld.co/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="mockupworld" href="https://www.mockupworld.co/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #1D2129;">
                   <span>MW</span>
                 </div>
@@ -5313,7 +6516,7 @@
                   <p>样机资源网站</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://shots.so/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="shots" href="https://shots.so/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #722ED1;">
                   <span>SH</span>
                 </div>
@@ -5328,7 +6531,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">插画</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://storytribeapp.com/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="storytribe" href="https://storytribeapp.com/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #F77234;">
                   <span>ST</span>
                 </div>
@@ -5343,7 +6546,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">二维码</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://cli.im/url" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="cliim" href="https://cli.im/url" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #165DFF;">
                   <span>QR</span>
                 </div>
@@ -5352,7 +6555,7 @@
                   <p>二维码生成工具</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.wwei.cn/?from=bdtp&bd_vid=10981631258720530686" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="wwei" href="https://www.wwei.cn/?from=bdtp&bd_vid=10981631258720530686" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #00B42A;">
                   <span>微</span>
                 </div>
@@ -5367,7 +6570,7 @@
           <div class="site-nav-category">
             <h2 class="site-nav-category-title">AI 工具</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card" href="https://chat.openai.com" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #10A37F;">
                   <span>AI</span>
                 </div>
@@ -5376,7 +6579,7 @@
                   <p>OpenAI 智能对话</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.midjourney.com" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="midjourney" href="https://www.midjourney.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #121212;">
                   <span>MJ</span>
                 </div>
@@ -5385,7 +6588,7 @@
                   <p>AI 图像生成工具</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.notion.so" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="notion" href="https://www.notion.so" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #000000;">
                   <span>N</span>
                 </div>
@@ -5394,7 +6597,7 @@
                   <p>AI 笔记与工作空间</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.canva.com" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="canva" href="https://www.canva.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #00C4CC;">
                   <span>Ca</span>
                 </div>
@@ -5403,7 +6606,7 @@
                   <p>在线设计平台</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://hub.cocoloop.cn/?ref=www.pmkg.net" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="cocoloop" href="https://hub.cocoloop.cn/?ref=www.pmkg.net" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #722ED1;">
                   <span>CL</span>
                 </div>
@@ -5412,7 +6615,7 @@
                   <p>CocoLoop 是当贝推出的一个 OpenClaw 类 AI Agent 技能商店，提供技能获取、安全审核与集成服务</p>
                 </div>
               </a>
-              <a class="site-nav-card" href="https://www.xingliu.art/" target="_blank" rel="noopener">
+              <a class="site-nav-card site-feature-card" data-site="xingliu" href="https://www.xingliu.art/" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #165DFF;">
                   <span>XL</span>
                 </div>
@@ -5652,6 +6855,256 @@
         </div>
       </div>
 
+      <!-- 游戏室页面 -->
+      <div class="page game-room-page" id="page-game-room">
+        <div class="game-room-header">
+          <div class="game-room-title-wrap">
+            <h1>游戏室</h1>
+            <p>休闲时光，欢乐无限</p>
+          </div>
+          <button class="game-room-add-btn" onclick="openGameImportModal()" aria-label="导入游戏">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="game-room-content">
+          <div class="game-grid">
+            <div class="game-card" onclick="switchPage('tetris')">
+              <div class="game-cover tetris-cover">
+                <div class="game-cover-overlay">
+                  <span class="game-play-btn">▶</span>
+                </div>
+              </div>
+              <div class="game-info">
+                <div class="game-title-row">
+                  <h3 class="game-name">俄罗斯方块</h3>
+                  <span class="game-type">休闲益智</span>
+                </div>
+                <p class="game-desc">经典的方块消除游戏，旋转、移动、消除，挑战你的反应速度和策略思维。</p>
+              </div>
+            </div>
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A1.gba', '超级马里奥A1', 'gba', 'GBA')">
+              <div class="game-cover">
+                <img src="assets/game-resource/超级马里奥A1.png" alt="超级马里奥A1封面" class="game-cover-img">
+                <div class="game-cover-overlay">
+                  <span class="game-play-btn">▶</span>
+                </div>
+              </div>
+              <div class="game-info">
+                <div class="game-title-row">
+                  <h3 class="game-name">超级马里奥A1</h3>
+                  <span class="game-type">GBA</span>
+                </div>
+                <p class="game-desc">经典横版冒险游戏，控制马里奥闯关救公主，收集金币，踩踏敌人。</p>
+              </div>
+            </div>
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A2.gba', '超级马里奥A2', 'gba', 'GBA')">
+              <div class="game-cover">
+                <img src="assets/game-resource/超级马里奥A2.png" alt="超级马里奥A2封面" class="game-cover-img">
+                <div class="game-cover-overlay">
+                  <span class="game-play-btn">▶</span>
+                </div>
+              </div>
+              <div class="game-info">
+                <div class="game-title-row">
+                  <h3 class="game-name">超级马里奥A2</h3>
+                  <span class="game-type">GBA</span>
+                </div>
+                <p class="game-desc">马里奥系列的GBA续作，更多关卡、更多挑战，经典的平台跳跃体验。</p>
+              </div>
+            </div>
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A3.gba', '超级马里奥A3', 'gba', 'GBA')">
+              <div class="game-cover">
+                <img src="assets/game-resource/超级马里奥A3.png" alt="超级马里奥A3封面" class="game-cover-img">
+                <div class="game-cover-overlay">
+                  <span class="game-play-btn">▶</span>
+                </div>
+              </div>
+              <div class="game-info">
+                <div class="game-title-row">
+                  <h3 class="game-name">超级马里奥A3</h3>
+                  <span class="game-type">GBA</span>
+                </div>
+                <p class="game-desc">超级马里奥A3，延续经典的冒险玩法，带来更丰富的关卡设计和隐藏要素。</p>
+              </div>
+            </div>
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A4.gba', '超级马里奥A4', 'gba', 'GBA')">
+              <div class="game-cover">
+                <img src="assets/game-resource/超级马里奥A4.png" alt="超级马里奥A4封面" class="game-cover-img">
+                <div class="game-cover-overlay">
+                  <span class="game-play-btn">▶</span>
+                </div>
+              </div>
+              <div class="game-info">
+                <div class="game-title-row">
+                  <h3 class="game-name">超级马里奥A4</h3>
+                  <span class="game-type">GBA</span>
+                </div>
+                <p class="game-desc">超级马里奥A4，GBA平台上的经典之作，流畅的操作手感和精彩的Boss战。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 导入游戏弹窗 -->
+      <div class="game-import-modal" id="gameImportModal" onclick="closeGameImportModal(event)">
+        <div class="game-import-modal-content" onclick="event.stopPropagation()">
+          <div class="game-import-modal-header">
+            <h2>导入游戏</h2>
+            <button class="game-import-modal-close" onclick="closeGameImportModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+          <p class="game-import-desc">支持 FC/NES、GBA、SFC/SNES、GB/GBC、MD/Genesis 等平台 ROM 文件</p>
+          <div class="game-import-dropzone" id="gameDropzone" onclick="document.getElementById('gameFileInput').click()">
+            <div class="game-import-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="game-import-hint">拖放 ROM 文件到此处，或点击选择文件</p>
+            <p class="game-import-formats">.nes  .gba  .gb  .gbc  .sfc  .smc  .gen  .md  .zip</p>
+            <input type="file" id="gameFileInput" accept=".nes,.gba,.gb,.gbc,.sfc,.smc,.gen,.md,.zip" style="display:none" onchange="handleGameFileSelect(this)">
+          </div>
+        </div>
+      </div>
+
+      <!-- 模拟器游戏页面 -->
+      <div class="page emulator-page" id="page-emulator">
+        <button class="emulator-back-btn" onclick="closeEmulator()" aria-label="返回">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h1 class="emulator-title" id="emulatorTitle">模拟器</h1>
+
+        <div class="emulator-skin">
+          <img src="assets/game-resource/UI/背景@2x.webp" class="skin-bg" alt="">
+
+          <div class="skin-screen" id="emulatorScreen">
+            <div id="emulatorGame"></div>
+          </div>
+
+          <img src="assets/game-resource/UI/左肩键@2x.webp" class="skin-btn skin-l" data-key="l" alt="L">
+          <img src="assets/game-resource/UI/右肩键@2x.webp" class="skin-btn skin-r" data-key="r" alt="R">
+
+          <div class="skin-dpad" id="skinDpad">
+            <img src="assets/game-resource/UI/方向键@2x.webp" class="dpad-img" alt="方向键">
+            <div class="dpad-zone dpad-up" data-dir="up"></div>
+            <div class="dpad-zone dpad-down" data-dir="down"></div>
+            <div class="dpad-zone dpad-left" data-dir="left"></div>
+            <div class="dpad-zone dpad-right" data-dir="right"></div>
+          </div>
+
+          <img src="assets/game-resource/UI/X@2x.webp" class="skin-btn skin-x" data-key="x" alt="X">
+          <img src="assets/game-resource/UI/Y@2x.webp" class="skin-btn skin-y" data-key="y" alt="Y">
+          <img src="assets/game-resource/UI/A@2x.webp" class="skin-btn skin-a" data-key="a" alt="A">
+          <img src="assets/game-resource/UI/B@2x.webp" class="skin-btn skin-b" data-key="b" alt="B">
+
+          <img src="assets/game-resource/UI/菜单@2x.webp" class="skin-btn skin-menu" data-key="menu" alt="MENU">
+          <img src="assets/game-resource/UI/选择@2x.webp" class="skin-btn skin-select" data-key="select" alt="SELECT">
+          <img src="assets/game-resource/UI/开始/暂停@2x.webp" class="skin-btn skin-start" data-key="start" alt="START">
+        </div>
+      </div>
+
+      <!-- 俄罗斯方块游戏页面 -->
+      <div class="page tetris-page" id="page-tetris">
+        <div class="tetris-top-bar">
+          <button class="tetris-back-btn" onclick="switchPage('game-room')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            返回
+          </button>
+          <h1 class="tetris-title">俄罗斯方块</h1>
+          <div class="tetris-top-spacer"></div>
+        </div>
+
+        <div class="tetris-main-area">
+          <div class="tetris-screen">
+            <canvas id="tetrisCanvas" width="300" height="600"></canvas>
+            <div class="tetris-overlay" id="tetrisOverlay">
+              <div class="tetris-overlay-content">
+                <h2 id="tetrisOverlayTitle">俄罗斯方块</h2>
+                <p id="tetrisOverlayText">点击开始游戏</p>
+                <button class="tetris-start-btn" onclick="startTetris()">开始游戏</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tetris-side-panel">
+            <div class="tetris-info-card">
+              <span class="tetris-info-label">得分</span>
+              <span class="tetris-info-value" id="tetrisScore">0</span>
+            </div>
+            <div class="tetris-info-card">
+              <span class="tetris-info-label">等级</span>
+              <span class="tetris-info-value" id="tetrisLevel">1</span>
+            </div>
+            <div class="tetris-info-card">
+              <span class="tetris-info-label">最高分</span>
+              <span class="tetris-info-value" id="tetrisHighScore">0</span>
+            </div>
+            <button class="tetris-info-card tetris-pause-card" onclick="toggleTetrisPause()">
+              <span class="tetris-pause-icon">⏸</span>
+              <span class="tetris-pause-text">暂停</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tetris-controls-area">
+          <div class="tetris-dpad">
+            <div class="tetris-dpad-row">
+              <div class="tetris-dpad-cell"></div>
+              <button class="tetris-circ-btn tetris-rotate-btn" onclick="tetrisRotate()" aria-label="旋转">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 4v6h-6"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                </svg>
+              </button>
+              <div class="tetris-dpad-cell"></div>
+            </div>
+            <div class="tetris-dpad-row">
+              <button class="tetris-circ-btn tetris-left-btn" onclick="tetrisMoveLeft()" aria-label="左移">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 12H5"/>
+                  <path d="M12 19l-7-7 7-7"/>
+                </svg>
+              </button>
+              <div class="tetris-dpad-cell"></div>
+              <button class="tetris-circ-btn tetris-right-btn" onclick="tetrisMoveRight()" aria-label="右移">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"/>
+                  <path d="M12 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+            <div class="tetris-dpad-row">
+              <div class="tetris-dpad-cell"></div>
+              <button class="tetris-circ-btn tetris-down-btn" onclick="tetrisMoveDown()" aria-label="下落">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 5v14"/>
+                  <path d="M19 12l-7 7-7-7"/>
+                </svg>
+              </button>
+              <div class="tetris-dpad-cell"></div>
+            </div>
+          </div>
+          <button class="tetris-drop-btn" onclick="tetrisHardDrop()" aria-label="快速落下">
+            <span class="tetris-drop-icon">⏬</span>
+            <span class="tetris-drop-text">快速落下</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Bottom Navigation (Mobile) -->
   <nav class="bottom-nav" id="bottomNav">
     <ul class="bottom-nav-list">
@@ -5687,6 +7140,11 @@
           <li class="submenu-item">
             <a class="submenu-link" data-bpage="compress" href="javascript:void(0)" onclick="switchPage('compress')">
               图片压缩
+            </a>
+          </li>
+          <li class="submenu-item">
+            <a class="submenu-link" data-bpage="convert" href="javascript:void(0)" onclick="switchPage('convert')">
+              格式转换
             </a>
           </li>
         </ul>
@@ -5725,14 +7183,20 @@
           视频下载
         </a>
       </li>
+      <li class="bottom-nav-item">
+        <a class="bottom-nav-link" data-bpage="game-room" href="javascript:void(0)" onclick="switchPage('game-room')">
+          <span class="bottom-nav-icon">🎮</span>
+          游戏室
+        </a>
+      </li>
     </ul>
   </nav>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
-  <!-- Tooltip -->
-  <div class="site-tooltip" id="siteTooltip"></div>
+  <!-- 设计资源 功能介绍简单 Tooltip -->
+  <div class="site-feature-tooltip" id="siteFeatureTooltip"></div>
 
   <script>
     const input = document.getElementById('textInput');
@@ -5985,55 +7449,122 @@
       setTimeout(() => toast.classList.remove('show'), 1600);
     }
 
-    // Tooltip - 网站导航简介悬浮显示
-    function initSiteNavTooltip() {
-      const tooltip = document.getElementById('siteTooltip');
+    // 设计资源 - 功能介绍简单 Tooltip
+    const siteFeatureData = {
+      // 设计资源
+      figma: 'Figma 是一款基于浏览器的协作式 UI 设计工具，支持多人实时在线协同设计，内置矢量绘图、组件系统、自动布局、原型交互、Dev Mode 代码交付等功能，是当下 UI/UX 设计师的主流生产力工具。',
+      dribbble: 'Dribbble 是全球知名的设计师作品展示与灵感发现社区，汇聚海量高质量 UI、插画、品牌、动效设计作品，支持按颜色/标签/类别筛选，提供设计师招聘与作品集展示功能。',
+      behance: 'Behance 是 Adobe 旗下创意作品展示平台，覆盖平面、UI、插画、摄影、动效等多领域，支持按项目完整呈现创作过程，设有创意招聘与 Live 直播学习，与 Creative Cloud 无缝衔接。',
+      iconfont: 'iconfont 是阿里巴巴出品的矢量图标资源平台，收录数百万免费商用矢量图标，支持 SVG/PNG/AI 多格式下载与 iconfont 字体生成，可创建私有图标库团队共享，还提供矢量插画资源。',
+      iconsax: 'Iconsax 是高质量矢量图标库，提供 2500+ 精美的线性图标，支持 React、Vue、Flutter 等多种框架，支持自定义颜色与大小，所有图标可免费商用，适合 UI 设计师与开发者使用。',
+      // 开发工具
+      github: 'GitHub 是全球最大的代码托管与协作平台，基于 Git 提供版本控制、代码审查、Issues 项目管理、GitHub Actions 自动化 CI/CD、Codespaces 云端开发环境，是开发者必备的协作工具。',
+      stackoverflow: 'Stack Overflow 是全球最大的程序员问答社区，汇聚海量技术问题与解答，覆盖各类编程语言与框架，支持按标签检索精准答案，是开发者解决技术难题的首选平台。',
+      codepen: 'CodePen 是在线前端代码演示与分享平台，支持 HTML/CSS/JS 实时编辑预览，方便快速制作 Demo、调试代码片段、展示创意效果，是前端开发者常用的在线 playground。',
+      mdn: 'MDN Web Docs 是 Mozilla 维护的权威 Web 开发文档，覆盖 HTML、CSS、JavaScript、Web API 等前端技术，提供详尽的 API 参考与教程，是 Web 开发者最信赖的官方文档。',
+      // 实用工具
+      fuguang: '浮光是一款 Mac 实用工具合集，汇集多种常用小工具与效率功能，帮助 Mac 用户一站式解决日常使用中的各类需求。',
+      // 地图资源
+      'aliyun-datav': '阿里云 DataV 数据可视化平台提供中国省市行政区 GeoJSON 与 SVG 地图数据下载，支持精确到县级的行政区划边界，是制作中国地图可视化项目的必备数据源。',
+      'echarts-map': 'ECharts Map 是基于 ECharts 的中国地图扩展工具，提供县乡镇街道级精细 SVG 地图数据下载，支持行政区划层级钻取，适合制作细颗粒度地区分布图。',
+      poi86: 'poi86 提供细颗粒度区县地图与 POI 兴趣点数据，基于高德地图数据源，支持区县、街道、乡镇等多层级地理信息查询与下载。',
+      mapbox: 'Mapbox 是可自定义的地图服务平台，提供丰富的地图样式定制、地理编码、路径规划、卫星影像等 API 服务，适合开发者构建个性化地图应用。',
+      // 图表资源
+      echart: 'Apache ECharts 官方示例库，提供折线图、柱状图、饼图、散点图、地图、关系图等各类图表的代码示例与在线预览，支持直接复制使用，是数据可视化开发的参考宝典。',
+      // 图片处理
+      removebg: 'remove.bg 是一款 AI 驱动的在线抠图工具，5 秒自动去除图片背景，支持人物、商品、动物等多种主体识别，可输出高清透明背景图，免费额度有限。',
+      'online-ps': '在线 PS 精简版是基于浏览器的图片编辑器，提供图层、滤镜、选区、画笔等常用 Photoshop 功能，免安装即可在线修图，适合简单图片处理需求。',
+      snapedit: 'SnapEdit 是 AI 人工智能照片编辑器，支持一键抠图、去除水印与多余对象、增强画质、人脸美化等功能，操作简单无需专业修图技能。',
+      newprofilepic: 'newprofilepic 是在线头像制作工具，基于 AI 生成个性化头像，支持多种艺术风格转换，可上传照片一键生成卡通、油画、素描等风格头像。',
+      zjzp: '证件数码相片检测中心提供证件照质量在线检测服务，支持身份证、护照、签证等多种证件规格检测，自动检查尺寸、背景、表情、姿态等是否符合规范。',
+      tinypng: 'TinyPNG 是在线图片压缩工具，使用智能有损压缩技术大幅减小 PNG/JPEG/WebP 文件体积，保持几乎无损画质，免费支持最多 20 张图片同时上传压缩。',
+      // 设计导航
+      uisdc: '优设导航是优设（UISDC）出品的设计师网站导航，精选设计教程、灵感网站、设计工具、素材资源等优质内容，是国内设计师常用的导航站点。',
+      aibot: 'AI 工具集收录国内外各类 AI 工具与产品，覆盖 AI 绘画、AI 写作、AI 视频、AI 编程等多个方向，提供分类导航与详细介绍，方便快速发现优质 AI 工具。',
+      huisezhizhao: '灰大设计导航是设计师灰大整理的设计资源导航站，精选 UI、插画、图标、配色、字体、样机等设计相关网站，是寻找设计灵感与素材的实用工具。',
+      xiaozhongjishu: '小众技术是聚焦小众技术、独立开发与效率工具的导航站，精选冷门但实用的软件、网站与开发资源，适合发现别具一格的技术产品。',
+      'shejidaren-book': '设计书籍导航是设计师人整理的设计相关书籍推荐站，精选 UI、UX、平面、品牌、插画等设计领域的经典书籍，是设计师进阶学习的书单参考。',
+      // 样机包装
+      pacdora: 'Pacdora 是免费样机与模型在线生成器，提供海量包装盒、瓶身、杯具、袋子等 3D 样机模板，上传设计图即可在线生成产品样机效果图，适合包装设计师使用。',
+      baoxiaohe: '包小盒是在线包装印刷设计平台，提供海量包装模板与 3D 在线设计工具，支持刀模编辑、智能贴图、3D 预览，可一键下单印刷，是包装设计印刷的一站式服务。',
+      mockupworld: 'Mockupworld 是全球知名免费样机资源网站，提供海量高质量的 PS 与 Sketch 样机文件下载，覆盖手机、电脑、印刷品、包装、服饰等多种品类。',
+      shots: 'Shots 是在线样机设计工具，提供精美的设备框、浏览器框、社交媒体封面等样机模板，上传截图即可快速生成专业展示图，适合设计师制作作品展示。',
+      // 插画
+      storytribe: 'Story Tribe 是零门槛插画神器，提供可自由组合的人物、场景、道具插画素材，无需绘画基础即可通过拖拽组合制作故事插画与漫画，适合内容创作者使用。',
+      // 二维码
+      cliim: '草料二维码是国内领先的二维码生成与管理平台，支持网址、文本、图片、文件、音视频等多类型二维码生成，提供活码、批量生成、扫码统计等进阶功能。',
+      wwei: '微微二维码是在线二维码生成工具，支持网址、文本、名片、WiFi 等多种类型二维码生成，提供样式美化、Logo 嵌入、批量生成等功能，操作简单免费使用。',
+      // AI 工具
+      chatgpt: 'ChatGPT 是 OpenAI 推出的智能对话助手，基于 GPT 大语言模型，支持问答、写作、翻译、编程、分析等多种任务，是当下最具代表性的 AI 生产力工具。',
+      midjourney: 'Midjourney 是 AI 图像生成领域的代表产品，通过文字描述生成高质量艺术图像，擅长插画、概念设计、摄影风格等多种视觉风格，是设计师与创意工作者的灵感来源。',
+      notion: 'Notion 是集笔记、文档、数据库、看板、Wiki 于一体的 AI 工作空间，支持团队协作与知识管理，内置 AI 助手可辅助写作、总结、查询，是高效办公的全能工具。',
+      canva: 'Canva 是在线设计平台，提供海报、PPT、社媒封面、名片等海量模板，拖拽式编辑零门槛上手，配合 AI 设计助手与丰富素材库，适合非专业用户快速制作设计作品。',
+      cocoloop: 'CocoLoop 是当贝推出的 OpenClaw 类 AI Agent 技能商店，提供 AI 技能获取、安全审核与集成服务，帮助开发者快速接入与分发 AI Agent 能力。',
+      xingliu: '星流是 AI 图像生成工具，基于自研大模型提供文字生成图像服务，支持多种艺术风格与场景生成，适合设计师、内容创作者快速产出高质量视觉素材。'
+    };
+
+    function initSiteFeatureTooltip() {
+      const tooltip = document.getElementById('siteFeatureTooltip');
       if (!tooltip) return;
 
-      const cards = document.querySelectorAll('.site-nav-card');
+      const cards = document.querySelectorAll('.site-feature-card');
+      if (!cards.length) return;
+
       let hideTimer = null;
+      let currentCard = null;
+
+      const positionTooltip = () => {
+        if (!currentCard) return;
+        const cardRect = currentCard.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+
+        let left = cardRect.left + cardRect.width / 2 - tooltipRect.width / 2;
+        let top = cardRect.top - tooltipRect.height - 10;
+
+        if (left < 8) left = 8;
+        if (left + tooltipRect.width > window.innerWidth - 8) {
+          left = window.innerWidth - tooltipRect.width - 8;
+        }
+        tooltip.classList.remove('tooltip-top', 'tooltip-bottom');
+        if (top < 8) {
+          top = cardRect.bottom + 10;
+          tooltip.classList.add('tooltip-top');
+        } else {
+          tooltip.classList.add('tooltip-bottom');
+        }
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+      };
 
       cards.forEach(card => {
-        const descEl = card.querySelector('.site-nav-info p');
-        if (!descEl) return;
+        const siteKey = card.getAttribute('data-site');
+        const text = siteFeatureData[siteKey];
+        if (!text) return;
 
-        card.addEventListener('mouseenter', (e) => {
-          const text = descEl.textContent.trim();
-          if (!text) return;
-          const isOverflowed = descEl.scrollWidth > descEl.clientWidth;
-          if (!isOverflowed) return;
-
+        card.addEventListener('mouseenter', () => {
           clearTimeout(hideTimer);
+          currentCard = card;
           tooltip.textContent = text;
           tooltip.classList.add('show');
-
-          const cardRect = card.getBoundingClientRect();
-          const tooltipRect = tooltip.getBoundingClientRect();
-
-          let left = cardRect.left + cardRect.width / 2 - tooltipRect.width / 2;
-          let top = cardRect.top - tooltipRect.height - 10;
-
-          if (left < 8) left = 8;
-          if (left + tooltipRect.width > window.innerWidth - 8) {
-            left = window.innerWidth - tooltipRect.width - 8;
-          }
-          tooltip.classList.remove('tooltip-top', 'tooltip-bottom');
-          if (top < 8) {
-            top = cardRect.bottom + 10;
-            tooltip.classList.add('tooltip-top');
-          } else {
-            tooltip.classList.add('tooltip-bottom');
-          }
-
-          tooltip.style.left = left + 'px';
-          tooltip.style.top = top + 'px';
+          requestAnimationFrame(positionTooltip);
         });
 
         card.addEventListener('mouseleave', () => {
           hideTimer = setTimeout(() => {
             tooltip.classList.remove('show');
+            currentCard = null;
           }, 100);
         });
+      });
+
+      window.addEventListener('scroll', () => {
+        tooltip.classList.remove('show');
+        currentCard = null;
+      }, { passive: true });
+      window.addEventListener('resize', () => {
+        tooltip.classList.remove('show');
+        currentCard = null;
       });
     }
 
@@ -6289,30 +7820,328 @@
         if (doneFiles.length === 0) return;
 
         const downloadAllBtn = document.getElementById('compressDownloadAllBtn');
-        downloadAllBtn.textContent = '下载中...';
+        downloadAllBtn.textContent = '打包中...';
         downloadAllBtn.disabled = true;
 
-        let downloaded = 0;
-        doneFiles.forEach((item, index) => {
-          setTimeout(() => {
-            const link = document.createElement('a');
-            const ext = currentFormat === 'jpeg' ? 'jpg' : currentFormat;
-            const baseName = item.name.replace(/\.[^.]+$/, '');
-            link.download = baseName + '_compressed.' + ext;
-            link.href = item.compressedDataUrl || URL.createObjectURL(item.compressed);
-            link.click();
+        // 使用 JSZip 打包所有压缩后的图片为 ZIP
+        const zip = new JSZip();
+        const ext = currentFormat === 'jpeg' ? 'jpg' : currentFormat;
+        const usedNames = {};
 
-            downloaded++;
-            if (downloaded === doneFiles.length) {
-              downloadAllBtn.textContent = '全部下载';
-              downloadAllBtn.disabled = false;
-            }
-          }, index * 200);
+        doneFiles.forEach(item => {
+          let baseName = item.name.replace(/\.[^.]+$/, '');
+          // 避免重名冲突
+          let finalName = baseName + '_compressed.' + ext;
+          if (usedNames[finalName]) {
+            usedNames[finalName]++;
+            finalName = baseName + '_compressed_' + usedNames[finalName] + '.' + ext;
+          } else {
+            usedNames[finalName] = 1;
+          }
+          // item.compressed 已是 Blob
+          zip.file(finalName, item.compressed);
+        });
+
+        zip.generateAsync({ type: 'blob', compression: 'DEFLATE' }).then(zipBlob => {
+          const url = URL.createObjectURL(zipBlob);
+          const link = document.createElement('a');
+          const ts = new Date();
+          const pad = n => String(n).padStart(2, '0');
+          const stamp = ts.getFullYear() + pad(ts.getMonth() + 1) + pad(ts.getDate()) + '_' + pad(ts.getHours()) + pad(ts.getMinutes()) + pad(ts.getSeconds());
+          link.download = 'compressed_images_' + stamp + '.zip';
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }).catch(err => {
+          console.error('打包失败:', err);
+          alert('打包下载失败，请重试');
+        }).finally(() => {
+          downloadAllBtn.textContent = '全部下载';
+          downloadAllBtn.disabled = false;
         });
       };
 
       // 初始化
       initCompress();
+    })();
+
+    // ========== 图片格式转换功能 ==========
+    (function() {
+      const convertFiles = [];
+      let currentFormat = 'png';
+
+      function initConvert() {
+        const uploadArea = document.getElementById('convertUploadArea');
+        const fileInput = document.getElementById('convertFileInput');
+        const qualitySlider = document.getElementById('convertQuality');
+        const qualityValue = document.getElementById('convertQualityValue');
+        const qualityWrap = document.getElementById('convertQualityWrap');
+        const formatBtns = document.querySelectorAll('.convert-format-btn');
+
+        // 文件上传
+        fileInput.addEventListener('change', function(e) {
+          handleFiles(this.files);
+          this.value = ''; // 允许重复选择同一文件
+        });
+
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          this.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', function(e) {
+          e.preventDefault();
+          this.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', function(e) {
+          e.preventDefault();
+          this.classList.remove('dragover');
+          handleFiles(e.dataTransfer.files);
+        });
+
+        // 质量滑块
+        qualitySlider.addEventListener('input', function() {
+          qualityValue.textContent = this.value + '%';
+        });
+
+        // 格式按钮
+        formatBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            formatBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentFormat = this.dataset.format;
+            // 仅 JPG / WebP 显示质量滑块
+            qualityWrap.style.display = (currentFormat === 'jpeg' || currentFormat === 'webp') ? 'block' : 'none';
+          });
+        });
+      }
+
+      function handleFiles(files) {
+        if (!files || files.length === 0) return;
+
+        for (const file of files) {
+          if (!file.type.startsWith('image/')) continue;
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+              const item = {
+                id: Date.now() + Math.random(),
+                file: file,
+                name: file.name,
+                originalSize: file.size,
+                originalType: file.type,
+                img: img,
+                dataUrl: e.target.result,
+                converted: null,
+                convertedSize: 0,
+                convertedDataUrl: null,
+                status: 'pending'
+              };
+              convertFiles.push(item);
+              updateConvertPreview();
+            };
+            img.onerror = function() {
+              showToast('图片加载失败：' + file.name, 'error');
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function updateConvertPreview() {
+        const previewArea = document.getElementById('convertPreviewArea');
+        const previewList = document.getElementById('convertPreviewList');
+        const countEl = document.getElementById('convertCount');
+
+        countEl.textContent = convertFiles.length;
+
+        if (convertFiles.length === 0) {
+          previewArea.style.display = 'none';
+          return;
+        }
+
+        previewArea.style.display = 'block';
+        previewList.innerHTML = '';
+
+        convertFiles.forEach((item) => {
+          const el = document.createElement('div');
+          el.className = 'convert-item';
+          el.id = 'convert-item-' + item.id;
+
+          const statusText = {
+            pending: '待转换',
+            processing: '转换中...',
+            done: '已完成',
+            error: '转换失败'
+          }[item.status];
+
+          const sizeText = item.status === 'done'
+            ? formatSize(item.originalSize) + ' → ' + formatSize(item.convertedSize)
+            : formatSize(item.originalSize);
+
+          el.innerHTML = `
+            <img class="convert-item-thumb" src="${item.dataUrl}" alt="${item.name}">
+            <div class="convert-item-info">
+              <div class="convert-item-name">${item.name}</div>
+              <div class="convert-item-size">${sizeText}</div>
+            </div>
+            <span class="convert-item-status ${item.status}">${statusText}</span>
+            ${item.status === 'done' ? '<button class="convert-item-action download-btn" onclick="downloadConvert(' + item.id + ')">下载</button>' : ''}
+          `;
+          previewList.appendChild(el);
+        });
+
+        const downloadAllBtn = document.getElementById('convertDownloadAllBtn');
+        const doneCount = convertFiles.filter(f => f.status === 'done' && f.converted).length;
+        if (doneCount > 0 && convertFiles.every(f => f.status !== 'processing')) {
+          downloadAllBtn.style.display = 'inline-flex';
+        } else {
+          downloadAllBtn.style.display = 'none';
+        }
+      }
+
+      function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+      }
+
+      window.startConvert = function() {
+        if (convertFiles.length === 0) return;
+
+        const quality = parseInt(document.getElementById('convertQuality').value) / 100;
+        const startBtn = document.getElementById('convertStartBtn');
+        startBtn.disabled = true;
+        startBtn.textContent = '转换中...';
+
+        let pending = convertFiles.filter(f => f.status === 'pending' || f.status === 'error');
+        let i = 0;
+        function next() {
+          if (i >= pending.length) {
+            startBtn.disabled = false;
+            startBtn.textContent = '开始转换';
+            return;
+          }
+          const item = pending[i++];
+          item.status = 'processing';
+          updateConvertPreview();
+          setTimeout(() => {
+            convertImage(item, quality);
+            next();
+          }, 50);
+        }
+        next();
+      };
+
+      function convertImage(item, quality) {
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = item.img.naturalWidth;
+          canvas.height = item.img.naturalHeight;
+
+          // JPG 不支持透明，先填充白底
+          if (currentFormat === 'jpeg') {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+          ctx.drawImage(item.img, 0, 0);
+
+          const mimeType = 'image/' + currentFormat;
+          const dataUrl = canvas.toDataURL(mimeType, quality);
+
+          // 转 Blob
+          const byteString = atob(dataUrl.split(',')[1]);
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+          }
+          const blob = new Blob([ab], { type: mimeType });
+
+          item.converted = blob;
+          item.convertedSize = blob.size;
+          item.convertedDataUrl = dataUrl;
+          item.status = 'done';
+          updateConvertPreview();
+        } catch (err) {
+          console.error('格式转换失败:', err);
+          item.status = 'error';
+          updateConvertPreview();
+        }
+      }
+
+      window.downloadConvert = function(id) {
+        const item = convertFiles.find(f => f.id === id);
+        if (!item || !item.converted) return;
+
+        const link = document.createElement('a');
+        const ext = currentFormat === 'jpeg' ? 'jpg' : currentFormat;
+        const baseName = item.name.replace(/\.[^.]+$/, '');
+        link.download = baseName + '.' + ext;
+        link.href = item.convertedDataUrl || URL.createObjectURL(item.converted);
+        link.click();
+      };
+
+      window.clearConvertList = function() {
+        convertFiles.length = 0;
+        updateConvertPreview();
+      };
+
+      window.downloadAllConvert = function() {
+        const doneFiles = convertFiles.filter(f => f.status === 'done' && f.converted);
+        if (doneFiles.length === 0) return;
+
+        const downloadAllBtn = document.getElementById('convertDownloadAllBtn');
+        downloadAllBtn.textContent = '打包中...';
+        downloadAllBtn.disabled = true;
+
+        // 使用 JSZip 打包所有转换后的图片为 ZIP
+        const zip = new JSZip();
+        const ext = currentFormat === 'jpeg' ? 'jpg' : currentFormat;
+        const usedNames = {};
+
+        doneFiles.forEach(item => {
+          const baseName = item.name.replace(/\.[^.]+$/, '');
+          let finalName = baseName + '.' + ext;
+          // 避免重名冲突
+          if (usedNames[finalName]) {
+            usedNames[finalName]++;
+            finalName = baseName + '_' + usedNames[finalName] + '.' + ext;
+          } else {
+            usedNames[finalName] = 1;
+          }
+          zip.file(finalName, item.converted);
+        });
+
+        zip.generateAsync({ type: 'blob', compression: 'DEFLATE' }).then(zipBlob => {
+          const url = URL.createObjectURL(zipBlob);
+          const link = document.createElement('a');
+          const ts = new Date();
+          const pad = n => String(n).padStart(2, '0');
+          const stamp = ts.getFullYear() + pad(ts.getMonth() + 1) + pad(ts.getDate()) + '_' + pad(ts.getHours()) + pad(ts.getMinutes()) + pad(ts.getSeconds());
+          link.download = 'converted_images_' + stamp + '.zip';
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }).catch(err => {
+          console.error('打包失败:', err);
+          showToast('打包下载失败，请重试', 'error');
+        }).finally(() => {
+          downloadAllBtn.textContent = '打包下载 ZIP';
+          downloadAllBtn.disabled = false;
+        });
+      };
+
+      // 初始化
+      initConvert();
     })();
 
     // Initialize theme from localStorage
@@ -6354,7 +8183,15 @@
 
       // Close mobile sidebar after selection
       if (window.innerWidth <= 768) {
-        toggleSidebar();
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.classList.contains('open')) {
+          toggleSidebar();
+        }
+      }
+
+      // 离开俄罗斯方块页面时暂停游戏
+      if (page !== 'tetris' && typeof window.tetrisPauseIfRunning === 'function') {
+        window.tetrisPauseIfRunning();
       }
 
       // Page switch logic
@@ -6367,11 +8204,14 @@
           window.initCutout();
         }
       } else if (page === 'image-compare' || page === 'review') {
-        // 图片比对页面初始化
         window.udcInit && window.udcInit();
       } else if (page === 'site-nav') {
-        initSiteNavTooltip();
-      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress' && page !== 'video-download') {
+        initSiteFeatureTooltip();
+      } else if (page === 'tetris') {
+        if (typeof window.tetrisOnPageShow === 'function') {
+          window.tetrisOnPageShow();
+        }
+      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress' && page !== 'convert' && page !== 'video-download' && page !== 'game-room' && page !== 'emulator') {
         showToast(`「${getPageName(page)}」功能开发中...`);
       }
     }
@@ -6702,7 +8542,7 @@
     })();
 
     function getPageName(page) {
-      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理', 'video-download': '视频下载' };
+      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', convert: '格式转换', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理', 'video-download': '视频下载', 'game-room': '游戏室', tetris: '俄罗斯方块', emulator: '模拟器' };
       return names[page] || page;
     }
 
@@ -8060,21 +9900,7 @@
 
   </script>
 
-    <!-- 运行时错误提示 -->
-    <div id="errorDisplay" style="display:none;position:fixed;top:0;left:0;right:0;background:#ef4444;color:#fff;padding:12px;z-index:99999;font-size:14px;"></div>
-    <script>
-    window.onerror = function(msg, src, line, col, error) {
-      var d = document.getElementById('errorDisplay');
-      if (d) { d.style.display='block'; d.textContent = 'JS错误: ' + msg + ' (行:' + line + ')'; }
-    };
-    window.console._log = window.console.log;
-    window.console.log = function() {
-      var d = document.getElementById('errorDisplay');
-      if (d && d.style.display==='none') { d.style.display='block'; d.style.background='#f59e0b'; d.style.color='#000'; }
-      if (d) d.textContent = 'console: ' + Array.from(arguments).join(' ');
-      window.console._log.apply(console, arguments);
-    };
-    </script>
+    <div id="errorDisplay" style="display:none;"></div>
 
   
   <!-- UI Diff Checker (UI设计走查) JS -->
@@ -10213,6 +12039,750 @@
         }
       }
     }).observe(document.body, { childList: true, subtree: true });
+
+    // ========== 俄罗斯方块游戏 ==========
+    (function() {
+      var COLS = 10;
+      var ROWS = 20;
+      var BLOCK_SIZE = 30;
+
+      var canvas, ctx;
+      var board = [];
+      var currentPiece = null;
+      var score = 0;
+      var level = 1;
+      var highScore = 0;
+      var gameLoop = null;
+      var isPaused = false;
+      var isGameOver = false;
+      var dropInterval = 1000;
+
+      function loadHighScore() {
+        try {
+          var saved = localStorage.getItem('tetris_high_score');
+          if (saved) {
+            highScore = parseInt(saved, 10);
+          }
+        } catch (e) {
+          highScore = 0;
+        }
+      }
+
+      function saveHighScore() {
+        try {
+          localStorage.setItem('tetris_high_score', highScore.toString());
+        } catch (e) {}
+      }
+
+      var SHAPES = {
+        I: { shape: [[1,1,1,1]], color: '#00F0F0' },
+        O: { shape: [[1,1],[1,1]], color: '#F0F000' },
+        T: { shape: [[0,1,0],[1,1,1]], color: '#A000F0' },
+        S: { shape: [[0,1,1],[1,1,0]], color: '#00F000' },
+        Z: { shape: [[1,1,0],[0,1,1]], color: '#F00000' },
+        J: { shape: [[1,0,0],[1,1,1]], color: '#0000F0' },
+        L: { shape: [[0,0,1],[1,1,1]], color: '#F0A000' }
+      };
+
+      var SHAPE_NAMES = ['I','O','T','S','Z','J','L'];
+
+      function createBoard() {
+        board = [];
+        for (var r = 0; r < ROWS; r++) {
+          board[r] = [];
+          for (var c = 0; c < COLS; c++) {
+            board[r][c] = null;
+          }
+        }
+      }
+
+      function randomPiece() {
+        var name = SHAPE_NAMES[Math.floor(Math.random() * SHAPE_NAMES.length)];
+        var def = SHAPES[name];
+        return {
+          shape: def.shape.map(function(row) { return row.slice(); }),
+          color: def.color,
+          x: Math.floor((COLS - def.shape[0].length) / 2),
+          y: 0
+        };
+      }
+
+      function rotatePiece(piece) {
+        var rows = piece.shape.length;
+        var cols = piece.shape[0].length;
+        var rotated = [];
+        for (var c = 0; c < cols; c++) {
+          rotated[c] = [];
+          for (var r = rows - 1; r >= 0; r--) {
+            rotated[c].push(piece.shape[r][c]);
+          }
+        }
+        return rotated;
+      }
+
+      function isValidMove(piece, offsetX, offsetY, newShape) {
+        var shape = newShape || piece.shape;
+        var newX = piece.x + offsetX;
+        var newY = piece.y + offsetY;
+
+        for (var r = 0; r < shape.length; r++) {
+          for (var c = 0; c < shape[r].length; c++) {
+            if (!shape[r][c]) continue;
+            var boardX = newX + c;
+            var boardY = newY + r;
+            if (boardX < 0 || boardX >= COLS || boardY >= ROWS) return false;
+            if (boardY >= 0 && board[boardY][boardX]) return false;
+          }
+        }
+        return true;
+      }
+
+      function mergePiece() {
+        for (var r = 0; r < currentPiece.shape.length; r++) {
+          for (var c = 0; c < currentPiece.shape[r].length; c++) {
+            if (currentPiece.shape[r][c]) {
+              var boardY = currentPiece.y + r;
+              var boardX = currentPiece.x + c;
+              if (boardY >= 0) {
+                board[boardY][boardX] = currentPiece.color;
+              }
+            }
+          }
+        }
+      }
+
+      function clearLines() {
+        var linesCleared = 0;
+        for (var r = ROWS - 1; r >= 0; r--) {
+          var full = true;
+          for (var c = 0; c < COLS; c++) {
+            if (!board[r][c]) {
+              full = false;
+              break;
+            }
+          }
+          if (full) {
+            board.splice(r, 1);
+            board.unshift(new Array(COLS).fill(null));
+            linesCleared++;
+            r++;
+          }
+        }
+        if (linesCleared > 0) {
+          var points = [0, 100, 300, 500, 800];
+          score += points[linesCleared] * level;
+          var newLevel = Math.floor(score / 1000) + 1;
+          if (newLevel !== level) {
+            level = newLevel;
+            dropInterval = Math.max(100, 1000 - (level - 1) * 100);
+          }
+          updateScore();
+        }
+      }
+
+      function updateScore() {
+        document.getElementById('tetrisScore').textContent = score;
+        document.getElementById('tetrisLevel').textContent = level;
+        document.getElementById('tetrisHighScore').textContent = highScore;
+      }
+
+      function drawBlock(x, y, color, size, context) {
+        context.fillStyle = color;
+        context.fillRect(x * size, y * size, size - 1, size - 1);
+        context.fillStyle = 'rgba(255,255,255,0.3)';
+        context.fillRect(x * size, y * size, size - 1, 3);
+        context.fillRect(x * size, y * size, 3, size - 1);
+        context.fillStyle = 'rgba(0,0,0,0.2)';
+        context.fillRect(x * size + size - 4, y * size, 3, size - 1);
+        context.fillRect(x * size, y * size + size - 4, size - 1, 3);
+      }
+
+      function draw() {
+        ctx.fillStyle = '#0F1419';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        for (var c = 1; c < COLS; c++) {
+          ctx.beginPath();
+          ctx.moveTo(c * BLOCK_SIZE, 0);
+          ctx.lineTo(c * BLOCK_SIZE, canvas.height);
+          ctx.stroke();
+        }
+        for (var r = 1; r < ROWS; r++) {
+          ctx.beginPath();
+          ctx.moveTo(0, r * BLOCK_SIZE);
+          ctx.lineTo(canvas.width, r * BLOCK_SIZE);
+          ctx.stroke();
+        }
+
+        for (var r = 0; r < ROWS; r++) {
+          for (var c = 0; c < COLS; c++) {
+            if (board[r][c]) {
+              drawBlock(c, r, board[r][c], BLOCK_SIZE, ctx);
+            }
+          }
+        }
+
+        if (currentPiece) {
+          for (var r = 0; r < currentPiece.shape.length; r++) {
+            for (var c = 0; c < currentPiece.shape[r].length; c++) {
+              if (currentPiece.shape[r][c]) {
+                drawBlock(currentPiece.x + c, currentPiece.y + r, currentPiece.color, BLOCK_SIZE, ctx);
+              }
+            }
+          }
+        }
+      }
+
+      function drop() {
+        if (isPaused || isGameOver) return;
+        if (isValidMove(currentPiece, 0, 1)) {
+          currentPiece.y++;
+        } else {
+          mergePiece();
+          clearLines();
+          currentPiece = randomPiece();
+          if (!isValidMove(currentPiece, 0, 0)) {
+            gameOver();
+          }
+        }
+        draw();
+      }
+
+      function gameOver() {
+        isGameOver = true;
+        if (gameLoop) {
+          clearInterval(gameLoop);
+          gameLoop = null;
+        }
+        if (score > highScore) {
+          highScore = score;
+          saveHighScore();
+        }
+        var overlay = document.getElementById('tetrisOverlay');
+        var title = document.getElementById('tetrisOverlayTitle');
+        var text = document.getElementById('tetrisOverlayText');
+        title.textContent = '游戏结束';
+        text.textContent = '最终得分：' + score;
+        overlay.classList.remove('hidden');
+        updateScore();
+        updatePauseUI();
+      }
+
+      function startGame() {
+        createBoard();
+        score = 0;
+        level = 1;
+        dropInterval = 1000;
+        isPaused = false;
+        isGameOver = false;
+        updateScore();
+        currentPiece = randomPiece();
+        draw();
+        updatePauseUI();
+
+        if (gameLoop) clearInterval(gameLoop);
+        gameLoop = setInterval(drop, dropInterval);
+
+        document.getElementById('tetrisOverlay').classList.add('hidden');
+      }
+
+      function updatePauseUI() {
+        var icon = document.querySelector('.tetris-pause-icon');
+        var text = document.querySelector('.tetris-pause-text');
+        if (!icon || !text) return;
+        if (isGameOver) {
+          icon.textContent = '↻';
+          text.textContent = '重新开始';
+        } else if (isPaused) {
+          icon.textContent = '▶';
+          text.textContent = '继续';
+        } else {
+          icon.textContent = '⏸';
+          text.textContent = '暂停';
+        }
+      }
+
+      function togglePause() {
+        if (isGameOver) {
+          startGame();
+          return;
+        }
+        isPaused = !isPaused;
+        var overlay = document.getElementById('tetrisOverlay');
+        var title = document.getElementById('tetrisOverlayTitle');
+        var text = document.getElementById('tetrisOverlayText');
+        if (isPaused) {
+          title.textContent = '已暂停';
+          text.textContent = '按 P 或点击继续';
+          overlay.classList.remove('hidden');
+        } else {
+          overlay.classList.add('hidden');
+        }
+        updatePauseUI();
+      }
+
+      function moveLeft() {
+        if (isPaused || isGameOver) return;
+        if (isValidMove(currentPiece, -1, 0)) {
+          currentPiece.x--;
+          draw();
+        }
+      }
+
+      function moveRight() {
+        if (isPaused || isGameOver) return;
+        if (isValidMove(currentPiece, 1, 0)) {
+          currentPiece.x++;
+          draw();
+        }
+      }
+
+      function moveDown() {
+        if (isPaused || isGameOver) return;
+        if (isValidMove(currentPiece, 0, 1)) {
+          currentPiece.y++;
+          score += 1;
+          updateScore();
+          draw();
+        }
+      }
+
+      function rotate() {
+        if (isPaused || isGameOver) return;
+        var rotated = rotatePiece(currentPiece);
+        if (isValidMove(currentPiece, 0, 0, rotated)) {
+          currentPiece.shape = rotated;
+          draw();
+        } else if (isValidMove(currentPiece, 1, 0, rotated)) {
+          currentPiece.x++;
+          currentPiece.shape = rotated;
+          draw();
+        } else if (isValidMove(currentPiece, -1, 0, rotated)) {
+          currentPiece.x--;
+          currentPiece.shape = rotated;
+          draw();
+        }
+      }
+
+      function hardDrop() {
+        if (isPaused || isGameOver) return;
+        while (isValidMove(currentPiece, 0, 1)) {
+          currentPiece.y++;
+          score += 2;
+        }
+        updateScore();
+        drop();
+      }
+
+      function handleKeydown(e) {
+        var tetrisPage = document.getElementById('page-tetris');
+        if (!tetrisPage.classList.contains('active')) return;
+
+        switch(e.key) {
+          case 'ArrowLeft':
+            e.preventDefault();
+            moveLeft();
+            break;
+          case 'ArrowRight':
+            e.preventDefault();
+            moveRight();
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            moveDown();
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            rotate();
+            break;
+          case ' ':
+            e.preventDefault();
+            hardDrop();
+            break;
+          case 'p':
+          case 'P':
+            e.preventDefault();
+            togglePause();
+            break;
+        }
+      }
+
+      function initTetris() {
+        canvas = document.getElementById('tetrisCanvas');
+        ctx = canvas.getContext('2d');
+        loadHighScore();
+        createBoard();
+        draw();
+        updateScore();
+        updatePauseUI();
+      }
+
+      window.startTetris = startGame;
+      window.toggleTetrisPause = togglePause;
+      window.tetrisMoveLeft = moveLeft;
+      window.tetrisMoveRight = moveRight;
+      window.tetrisMoveDown = moveDown;
+      window.tetrisRotate = rotate;
+      window.tetrisHardDrop = hardDrop;
+      window.tetrisPauseIfRunning = function() {
+        if (!isPaused && !isGameOver && currentPiece) {
+          togglePause();
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          initTetris();
+          document.addEventListener('keydown', handleKeydown);
+        });
+      } else {
+        initTetris();
+        document.addEventListener('keydown', handleKeydown);
+      }
+    })();
+
+    // ========== 游戏导入 & 模拟器逻辑 ==========
+    var emulatorLoaderLoaded = false;
+    var emulatorBlobUrl = null;
+
+    var ROM_FORMATS = {
+      '.nes':  { core: 'nes',     label: 'FC / NES' },
+      '.gba':  { core: 'gba',     label: 'GBA' },
+      '.gb':   { core: 'gb',      label: 'Game Boy' },
+      '.gbc':  { core: 'gb',      label: 'Game Boy Color' },
+      '.sfc':  { core: 'snes',    label: 'SFC / SNES' },
+      '.smc':  { core: 'snes',    label: 'SFC / SNES' },
+      '.gen':  { core: 'segaMD',  label: 'Mega Drive' },
+      '.md':   { core: 'segaMD',  label: 'Mega Drive' },
+      '.zip':  { core: null,      label: null }
+    };
+
+    function detectRomFormat(filename) {
+      var ext = filename.toLowerCase().match(/\.[^.]+$/);
+      if (!ext) return null;
+      var info = ROM_FORMATS[ext[0]];
+      if (!info) return null;
+      if (info.core) return info;
+      var inner = filename.toLowerCase().replace(/\.zip$/i, '');
+      var innerExt = inner.match(/\.[^.]+$/);
+      if (innerExt && ROM_FORMATS[innerExt[0]] && ROM_FORMATS[innerExt[0]].core) {
+        return ROM_FORMATS[innerExt[0]];
+      }
+      return { core: 'arcade', label: '街机 / Arcade' };
+    }
+
+    function openGameImportModal() {
+      var modal = document.getElementById('gameImportModal');
+      if (modal) modal.classList.add('open');
+    }
+
+    function closeGameImportModal(event) {
+      if (event && event.target !== event.currentTarget) return;
+      var modal = document.getElementById('gameImportModal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    function handleGameFileSelect(input) {
+      if (input.files && input.files[0]) {
+        loadRomFile(input.files[0]);
+        closeGameImportModal();
+      }
+    }
+
+    function loadRomFile(file) {
+      var info = detectRomFormat(file.name);
+      if (!info || !info.core) {
+        showToast('不支持的游戏文件格式，请选择 .nes .gba .gb .gbc .sfc .smc .gen .md 文件');
+        return;
+      }
+
+      if (emulatorBlobUrl) {
+        URL.revokeObjectURL(emulatorBlobUrl);
+        emulatorBlobUrl = null;
+      }
+      emulatorBlobUrl = URL.createObjectURL(file);
+
+      var gameName = file.name.replace(/\.[^.]+$/, '');
+      document.getElementById('emulatorTitle').textContent = gameName + '（' + info.label + '）';
+
+      switchPage('emulator');
+
+      var container = document.getElementById('emulatorGame');
+      container.innerHTML = '';
+
+      window.EJS_Buttons = false;
+      window.EJS_player = '#emulatorGame';
+      window.EJS_core = info.core;
+      window.EJS_gameUrl = emulatorBlobUrl;
+      window.EJS_pathtodata = 'assets/emulatorjs/data/';
+      window.EJS_startOnLoaded = true;
+      window.EJS_language = 'zh-CN';
+
+      if (!emulatorLoaderLoaded) {
+        var script = document.createElement('script');
+        script.src = 'assets/emulatorjs/data/loader.js';
+        script.onload = function() {
+          emulatorLoaderLoaded = true;
+        };
+        script.onerror = function() {
+          showToast('模拟器加载失败，请检查网络连接');
+        };
+        document.body.appendChild(script);
+      } else {
+        if (typeof window.EJS_Boot === 'function') {
+          window.EJS_Boot();
+        } else {
+          var script2 = document.createElement('script');
+          script2.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+          document.body.appendChild(script2);
+        }
+      }
+    }
+
+    function loadBuiltinRom(path, name, core, label) {
+      if (emulatorBlobUrl) {
+        URL.revokeObjectURL(emulatorBlobUrl);
+        emulatorBlobUrl = null;
+      }
+
+      document.getElementById('emulatorTitle').textContent = name + '（' + label + '）';
+
+      switchPage('emulator');
+
+      var container = document.getElementById('emulatorGame');
+      container.innerHTML = '';
+
+      window.EJS_Buttons = false;
+      window.EJS_player = '#emulatorGame';
+      window.EJS_core = core;
+      window.EJS_gameUrl = path;
+      window.EJS_pathtodata = 'assets/emulatorjs/data/';
+      window.EJS_startOnLoaded = true;
+      window.EJS_language = 'zh-CN';
+
+      if (!emulatorLoaderLoaded) {
+        var script = document.createElement('script');
+        script.src = 'assets/emulatorjs/data/loader.js';
+        script.onload = function() {
+          emulatorLoaderLoaded = true;
+        };
+        script.onerror = function() {
+          showToast('模拟器加载失败，请检查网络连接');
+        };
+        document.body.appendChild(script);
+      } else {
+        if (typeof window.EJS_Boot === 'function') {
+          window.EJS_Boot();
+        } else {
+          var script2 = document.createElement('script');
+          script2.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+          document.body.appendChild(script2);
+        }
+      }
+    }
+
+    function closeEmulator() {
+      var container = document.getElementById('emulatorGame');
+      container.innerHTML = '';
+      if (emulatorBlobUrl) {
+        URL.revokeObjectURL(emulatorBlobUrl);
+        emulatorBlobUrl = null;
+      }
+      delete window.EJS_player;
+      delete window.EJS_core;
+      delete window.EJS_gameUrl;
+      switchPage('game-room');
+    }
+
+    window.EJS_ready = function() {
+      var cleanup = function() {
+        var elements = document.querySelectorAll('#emulatorGame .ejs_loading_text, #emulatorGame .ejs_error_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
+        elements.forEach(function(el) {
+          el.style.display = 'none';
+          el.style.visibility = 'hidden';
+          el.style.opacity = '0';
+        });
+      };
+      cleanup();
+      setTimeout(cleanup, 500);
+      setTimeout(cleanup, 1500);
+      setTimeout(cleanup, 3000);
+    };
+
+    window.EJS_onGameStart = function() {
+      var cleanup = function() {
+        var elements = document.querySelectorAll('#emulatorGame .ejs_loading_text, #emulatorGame .ejs_error_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
+        elements.forEach(function(el) {
+          el.remove();
+        });
+      };
+      cleanup();
+      setTimeout(cleanup, 500);
+    };
+
+    // ========== 掌机皮肤按键控制 ==========
+    (function initEmulatorSkinControls() {
+      var activeKeys = {};
+
+      function sendKey(key, code, isDown) {
+        var opts = {
+          key: key,
+          code: code,
+          bubbles: true,
+          cancelable: true,
+          view: window
+        };
+        var keyCodeMap = {
+          'ArrowUp': 38, 'ArrowDown': 40, 'ArrowLeft': 37, 'ArrowRight': 39,
+          'x': 88, 'z': 90, 'a': 65, 's': 83,
+          'Enter': 13, 'Backspace': 8, 'Escape': 27
+        };
+        opts.keyCode = keyCodeMap[key] || key.charCodeAt(0);
+        opts.which = opts.keyCode;
+
+        var type = isDown ? 'keydown' : 'keyup';
+        var evt = new KeyboardEvent(type, opts);
+        window.dispatchEvent(evt);
+        document.dispatchEvent(evt);
+        var canvas = document.querySelector('#emulatorGame canvas');
+        if (canvas) canvas.dispatchEvent(evt);
+      }
+
+      function press(key, code) {
+        if (activeKeys[key]) return;
+        activeKeys[key] = true;
+        sendKey(key, code, true);
+      }
+
+      function release(key, code) {
+        if (!activeKeys[key]) return;
+        activeKeys[key] = false;
+        sendKey(key, code, false);
+      }
+
+      function bindSkinBtn(selector, key, code) {
+        var el = document.querySelector(selector);
+        if (!el) return;
+
+        var onStart = function(e) {
+          if (e.type === 'touchstart') e.preventDefault();
+          press(key, code);
+        };
+        var onEnd = function(e) {
+          release(key, code);
+        };
+        var onCancel = function(e) {
+          release(key, code);
+        };
+
+        el.addEventListener('mousedown', onStart);
+        el.addEventListener('mouseup', onEnd);
+        el.addEventListener('mouseleave', onCancel);
+        el.addEventListener('touchstart', onStart, {passive: false});
+        el.addEventListener('touchend', onEnd);
+        el.addEventListener('touchcancel', onCancel);
+      }
+
+      // 方向键
+      var dpad = document.getElementById('skinDpad');
+      if (dpad) {
+        var dirMap = {
+          'up':    ['ArrowUp', 'ArrowUp'],
+          'down':  ['ArrowDown', 'ArrowDown'],
+          'left':  ['ArrowLeft', 'ArrowLeft'],
+          'right': ['ArrowRight', 'ArrowRight']
+        };
+        dpad.querySelectorAll('.dpad-zone').forEach(function(zone) {
+          var dir = zone.dataset.dir;
+          var key = dirMap[dir][0];
+          var code = dirMap[dir][1];
+
+          var onStart = function(e) {
+            if (e.type === 'touchstart') e.preventDefault();
+            press(key, code);
+          };
+          var onEnd = function(e) {
+            release(key, code);
+          };
+
+          zone.addEventListener('mousedown', onStart);
+          zone.addEventListener('mouseup', onEnd);
+          zone.addEventListener('mouseleave', onEnd);
+          zone.addEventListener('touchstart', onStart, {passive: false});
+          zone.addEventListener('touchend', onEnd);
+          zone.addEventListener('touchcancel', onEnd);
+        });
+      }
+
+      // 功能键映射（GBA默认键位）
+      bindSkinBtn('.skin-l', 'a', 'KeyA');       // L
+      bindSkinBtn('.skin-r', 's', 'KeyS');       // R
+      bindSkinBtn('.skin-x', 'x', 'KeyX');       // X -> A按钮
+      bindSkinBtn('.skin-y', 'z', 'KeyZ');       // Y -> B按钮
+      bindSkinBtn('.skin-a', 'x', 'KeyX');       // A -> A按钮
+      bindSkinBtn('.skin-b', 'z', 'KeyZ');       // B -> B按钮
+      bindSkinBtn('.skin-select', 'Backspace', 'Backspace');
+      bindSkinBtn('.skin-start', 'Enter', 'Enter');
+
+      // MENU 按钮 -> 切换模拟器设置菜单
+      var menuBtn = document.querySelector('.skin-menu');
+      if (menuBtn) {
+        function openSettingsMenu() {
+          if (window.EJS_emulator && window.EJS_emulator.menu && typeof window.EJS_emulator.menu.toggle === 'function') {
+            window.EJS_emulator.menu.toggle();
+          } else if (window.EJS_emulator && typeof window.EJS_emulator.openSettings === 'function') {
+            window.EJS_emulator.openSettings();
+          } else {
+            var menuBar = document.querySelector('#emulatorGame .ejs_menu_bar');
+            if (menuBar) {
+              menuBar.classList.toggle('ejs_menu_bar_hidden');
+            }
+          }
+        }
+
+        menuBtn.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          openSettingsMenu();
+        });
+        menuBtn.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          openSettingsMenu();
+        }, {passive: false});
+      }
+    })();
+
+    // 拖放支持
+    function initGameDropzone() {
+      var dropzone = document.getElementById('gameDropzone');
+      if (!dropzone) return;
+      dropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('dragover');
+      });
+      dropzone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+      });
+      dropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('dragover');
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          loadRomFile(e.dataTransfer.files[0]);
+          closeGameImportModal();
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGameDropzone);
+    } else {
+      initGameDropzone();
+    }
 
     initTheme();
   </script>

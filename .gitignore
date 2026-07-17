@@ -13,6 +13,15 @@ assets/ai-models/
 # Lock file (optional, can include if needed)
 # package-lock.json
 
+# Dependencies
+node_modules/
+
+# IDE/editor configs
+.trae/
+
+# Backup files
+*-backup.*
+
 # OS files
 .DS_Store
 Thumbs.db
