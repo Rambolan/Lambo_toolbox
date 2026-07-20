@@ -6918,7 +6918,7 @@
                 <p class="game-desc">经典的方块消除游戏，旋转、移动、消除，挑战你的反应速度和策略思维。</p>
               </div>
             </div>
-            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A1.gba', '超级马里奥A1', 'gba', 'GBA')">
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/mario-a1.gba', '超级马里奥A1', 'gba', 'GBA')">
               <div class="game-cover">
                 <img src="assets/game-resource/超级马里奥A1.png" alt="超级马里奥A1封面" class="game-cover-img">
                 <div class="game-cover-overlay">
@@ -6933,7 +6933,7 @@
                 <p class="game-desc">经典横版冒险游戏，控制马里奥闯关救公主，收集金币，踩踏敌人。</p>
               </div>
             </div>
-            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A2.gba', '超级马里奥A2', 'gba', 'GBA')">
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/mario-a2.gba', '超级马里奥A2', 'gba', 'GBA')">
               <div class="game-cover">
                 <img src="assets/game-resource/超级马里奥A2.png" alt="超级马里奥A2封面" class="game-cover-img">
                 <div class="game-cover-overlay">
@@ -6948,7 +6948,7 @@
                 <p class="game-desc">马里奥系列的GBA续作，更多关卡、更多挑战，经典的平台跳跃体验。</p>
               </div>
             </div>
-            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A3.gba', '超级马里奥A3', 'gba', 'GBA')">
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/mario-a3.gba', '超级马里奥A3', 'gba', 'GBA')">
               <div class="game-cover">
                 <img src="assets/game-resource/超级马里奥A3.png" alt="超级马里奥A3封面" class="game-cover-img">
                 <div class="game-cover-overlay">
@@ -6963,7 +6963,7 @@
                 <p class="game-desc">超级马里奥A3，延续经典的冒险玩法，带来更丰富的关卡设计和隐藏要素。</p>
               </div>
             </div>
-            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/超级马里奥A4.gba', '超级马里奥A4', 'gba', 'GBA')">
+            <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/mario-a4.gba', '超级马里奥A4', 'gba', 'GBA')">
               <div class="game-cover">
                 <img src="assets/game-resource/超级马里奥A4.png" alt="超级马里奥A4封面" class="game-cover-img">
                 <div class="game-cover-overlay">
@@ -12592,16 +12592,17 @@
 
       fetch(encodeURI(path))
         .then(function(res) {
-          if (!res.ok) throw new Error('ROM加载失败: ' + res.status);
+          if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.statusText);
           return res.blob();
         })
         .then(function(blob) {
+          if (blob.size === 0) throw new Error('ROM文件大小为0');
           emulatorBlobUrl = URL.createObjectURL(blob);
           window.EJS_gameUrl = emulatorBlobUrl;
           startEmulator();
         })
         .catch(function(err) {
-          container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;">游戏加载失败：' + err.message + '</div>';
+          container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;font-size:14px;word-break:break-all;">游戏加载失败：' + err.message + '<br><br>路径: ' + path + '<br>编码: ' + encodeURI(path) + '</div>';
         });
     }
 
