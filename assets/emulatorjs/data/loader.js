@@ -14,6 +14,7 @@
     let scriptPath = (typeof window.EJS_pathtodata === "string") ? window.EJS_pathtodata : folderPath((new URL(document.currentScript.src)).pathname);
     if (!scriptPath.endsWith("/")) scriptPath += "/";
     //console.log(scriptPath);
+    const cacheBust = "?v=" + Date.now();
     function loadScript(file) {
         return new Promise(function(resolve) {
             let script = document.createElement("script");
@@ -21,7 +22,7 @@
                 if ("undefined" != typeof EJS_paths && typeof EJS_paths[file] === "string") {
                     return EJS_paths[file];
                 } else if (file.endsWith("emulator.min.js")) {
-                    return scriptPath + file;
+                    return scriptPath + file + cacheBust;
                 } else {
                     return scriptPath + "src/" + file;
                 }
@@ -42,7 +43,7 @@
                 if ("undefined" != typeof EJS_paths && typeof EJS_paths[file] === "string") {
                     return EJS_paths[file];
                 } else {
-                    return scriptPath + file;
+                    return scriptPath + file + cacheBust;
                 }
             }();
             css.onload = resolve;
