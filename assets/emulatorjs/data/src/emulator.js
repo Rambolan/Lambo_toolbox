@@ -598,12 +598,18 @@ class EmulatorJS {
                 this.textElem.innerText = this.localization("Download Game Core") + progress;
             }, false, { responseType: "arraybuffer", method: "GET" });
             if (res === -1) {
-                if (!this.supportsWebgl2) {
-                    this.startGameError(this.localization("Outdated graphics driver"));
-                } else {
-                    this.startGameError(this.localization("Error downloading core") + " (" + filename + ")");
+                this.textElem.innerText = this.localization("Download Game Core") + " (mirror)";
+                res = await this.downloadFile(`https://cdn.jsdelivr.net/gh/Rambolan/Lambo_toolbox@main/assets/emulatorjs/data/cores/${filename}`, (progress) => {
+                    this.textElem.innerText = this.localization("Download Game Core") + " (mirror)" + progress;
+                }, true, { responseType: "arraybuffer", method: "GET" });
+                if (res === -1) {
+                    if (!this.supportsWebgl2) {
+                        this.startGameError(this.localization("Outdated graphics driver"));
+                    } else {
+                        this.startGameError(this.localization("Error downloading core") + " (" + filename + ")");
+                    }
+                    return;
                 }
-                return;
             }
             gotCore(res.data);
             this.storage.core.put(filename, {
