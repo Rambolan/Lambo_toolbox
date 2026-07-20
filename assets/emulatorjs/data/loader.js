@@ -69,10 +69,15 @@
         }
     }
 
-    for (let i = 0; i < scripts.length; i++) {
-        await loadScript(scripts[i]);
+    if (("undefined" != typeof EJS_DEBUG_XX && true === EJS_DEBUG_XX)) {
+        for (let i = 0; i < scripts.length; i++) {
+            await loadScript(scripts[i]);
+        }
+        await loadStyle("emulator.css");
+    } else {
+        await loadScript("emulator.min.js");
+        await loadStyle("emulator.min.css");
     }
-    await loadStyle("emulator.css");
     const config = {};
     config.gameUrl = window.EJS_gameUrl;
     config.dataPath = scriptPath;
