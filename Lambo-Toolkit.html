@@ -1466,7 +1466,6 @@
       position: relative;
     }
     .emulator-page .ejs_loading_text,
-    .emulator-page .ejs_error_text,
     .emulator-page .ejs_start_button,
     .emulator-page .ejs_start_button_border,
     .emulator-page .ejs_game_background,
@@ -1475,6 +1474,20 @@
       visibility: hidden !important;
       opacity: 0 !important;
       pointer-events: none !important;
+    }
+    .emulator-page .ejs_error_text {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      color: #ff6b6b !important;
+      font-size: 14px !important;
+      padding: 20px !important;
+      text-align: center !important;
+      white-space: pre-wrap !important;
+      word-break: break-all !important;
+      z-index: 1000 !important;
+      position: relative !important;
+      background: rgba(0,0,0,0.9) !important;
     }
     .emulator-back-btn {
       position: fixed;
@@ -12554,21 +12567,7 @@
       window.EJS_startOnLoaded = true;
       window.EJS_language = 'zh-CN';
 
-      if (!emulatorLoaderLoaded) {
-        var script = document.createElement('script');
-        script.src = 'assets/emulatorjs/data/loader.js?v=2';
-        script.onload = function() {
-          emulatorLoaderLoaded = true;
-        };
-        script.onerror = function() {
-          showToast('模拟器加载失败，请检查网络连接');
-        };
-        document.body.appendChild(script);
-      } else {
-        if (typeof window.EJS_Boot === 'function') {
-          window.EJS_Boot();
-        }
-      }
+      startEmulator();
     }
 
     function loadBuiltinRom(path, name, core, label) {
@@ -12587,11 +12586,26 @@
       window.EJS_Buttons = false;
       window.EJS_player = '#emulatorGame';
       window.EJS_core = core;
-      window.EJS_gameUrl = path;
       window.EJS_pathtodata = 'assets/emulatorjs/data/';
       window.EJS_startOnLoaded = true;
       window.EJS_language = 'zh-CN';
 
+      fetch(encodeURI(path))
+        .then(function(res) {
+          if (!res.ok) throw new Error('ROM加载失败: ' + res.status);
+          return res.blob();
+        })
+        .then(function(blob) {
+          emulatorBlobUrl = URL.createObjectURL(blob);
+          window.EJS_gameUrl = emulatorBlobUrl;
+          startEmulator();
+        })
+        .catch(function(err) {
+          container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;">游戏加载失败：' + err.message + '</div>';
+        });
+    }
+
+    function startEmulator() {
       if (!emulatorLoaderLoaded) {
         var script = document.createElement('script');
         script.src = 'assets/emulatorjs/data/loader.js?v=2';
@@ -12624,16 +12638,13 @@
 
     window.EJS_ready = function() {
       var cleanup = function() {
-        var elements = document.querySelectorAll('#emulatorGame .ejs_loading_text, #emulatorGame .ejs_error_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
+        var elements = document.querySelectorAll('#emulatorGame .ejs_loading_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
         elements.forEach(function(el) {
           el.style.display = 'none';
           el.style.visibility = 'hidden';
           el.style.opacity = '0';
         });
       };
-      cleanup();
-      setTimeout(cleanup, 500);
-      setTimeout(cleanup, 1500);
       setTimeout(cleanup, 3000);
     };
 

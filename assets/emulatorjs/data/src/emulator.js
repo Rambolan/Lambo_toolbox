@@ -586,13 +586,6 @@ class EmulatorJS {
 
             let legacy = (this.supportsWebgl2 && this.webgl2Enabled ? "" : "-legacy");
             let filename = this.getCore() + (threads ? "-thread" : "") + legacy + "-wasm.data";
-            if (!this.debug) {
-                const result = await this.storage.core.get(filename);
-                if (result && result.version === rep.buildStart) {
-                    gotCore(result.data);
-                    return;
-                }
-            }
             const corePath = "cores/" + filename;
             let res = await this.downloadFile(corePath, (progress) => {
                 this.textElem.innerText = this.localization("Download Game Core") + progress;
@@ -612,10 +605,6 @@ class EmulatorJS {
                 }
             }
             gotCore(res.data);
-            this.storage.core.put(filename, {
-                version: rep.buildStart,
-                data: res.data
-            });
         });
     }
     initGameCore(js, wasm, thread) {
