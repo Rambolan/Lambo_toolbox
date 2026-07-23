@@ -1231,19 +1231,6 @@
       height: 100%;
       object-fit: cover;
     }
-    .tetris-cover {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .tetris-cover::before {
-      content: '■';
-      font-size: 60px;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 8px;
-      line-height: 1;
-    }
     .mario-cover {
       background: linear-gradient(135deg, #e60012 0%, #ff6b35 100%);
       display: flex;
@@ -1465,7 +1452,6 @@
       background: var(--td-bg-color-page);
       position: relative;
     }
-    .emulator-page .ejs_loading_text,
     .emulator-page .ejs_start_button,
     .emulator-page .ejs_start_button_border,
     .emulator-page .ejs_game_background,
@@ -1474,6 +1460,26 @@
       visibility: hidden !important;
       opacity: 0 !important;
       pointer-events: none !important;
+    }
+    .emulator-page .ejs_loading_text {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      color: #fff !important;
+      font-size: 14px !important;
+      padding: 10px !important;
+      text-align: center !important;
+      z-index: 1000 !important;
+      position: absolute !important;
+      top: 10px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      background: rgba(0,0,0,0.8) !important;
+      border-radius: 8px !important;
+      white-space: nowrap !important;
+      max-width: 90% !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
     .emulator-page .ejs_error_text {
       display: block !important;
@@ -1537,7 +1543,7 @@
       height: 30%;
       background: #000;
       border-radius: 12px;
-      overflow: hidden;
+      overflow: visible;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1545,10 +1551,17 @@
     #emulatorGame {
       width: 100%;
       height: 100%;
+      position: relative;
+      overflow: visible;
     }
     #emulatorGame canvas {
       width: 100% !important;
       height: 100% !important;
+      object-fit: contain;
+    }
+    #emulatorGame > div:not(.ejs_loading_text):not(.ejs_error_text) {
+      width: 100%;
+      height: 100%;
     }
     .skin-btn {
       position: absolute;
@@ -1557,6 +1570,8 @@
       transition: transform 0.05s ease;
       user-select: none;
       -webkit-user-select: none;
+      width: auto;
+      height: auto;
     }
     .skin-btn:active {
       transform: scale(0.92);
@@ -1565,13 +1580,11 @@
       top: 55%;
       left: 5%;
       width: 23%;
-      height: auto;
     }
     .skin-r {
       top: 55%;
       right: 5%;
       width: 23%;
-      height: auto;
     }
     .skin-dpad {
       position: absolute;
@@ -1600,423 +1613,41 @@
       top: 65.5%;
       right: 18%;
       width: 17.5%;
-      height: auto;
     }
     .skin-y {
       top: 71.5%;
       right: 33%;
       width: 17.5%;
-      height: auto;
     }
     .skin-a {
       top: 71.5%;
       right: 4%;
       width: 17.5%;
-      height: auto;
     }
     .skin-b {
       top: 77.5%;
       right: 18%;
       width: 17.5%;
-      height: auto;
     }
     .skin-menu {
       top: 90.5%;
       left: 5%;
       width: 20%;
-      height: auto;
     }
     .skin-select {
       top: 90.5%;
       left: 50%;
       width: 22%;
-      height: auto;
     }
     .skin-start {
       top: 90.5%;
       right: 5%;
       width: 20%;
-      height: auto;
     }
 
     @media(max-width:768px){
       .game-import-dropzone {
         padding: var(--td-size-5) var(--td-size-4);
-      }
-    }
-
-    /* ========== 俄罗斯方块 (Tetris) - TD Design 风格 ========== */
-    .tetris-page {
-      padding: var(--td-size-5);
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .tetris-top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--td-size-5);
-      gap: var(--td-size-3);
-    }
-    .tetris-title {
-      font-size: var(--td-font-size-title-large);
-      font-weight: 600;
-      color: var(--td-text-color-primary);
-      line-height: 1.3;
-      flex: 1;
-      text-align: center;
-      margin: 0;
-    }
-    .tetris-top-spacer {
-      width: 72px;
-      flex-shrink: 0;
-    }
-    .tetris-back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--td-size-2);
-      padding: 0 var(--td-size-4);
-      height: var(--td-comp-size-m);
-      border: 1px solid var(--td-border-level-2-color);
-      border-radius: var(--td-radius-medium);
-      background: var(--td-bg-color-container);
-      font-size: var(--td-font-size-body-medium);
-      color: var(--td-text-color-primary);
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
-    }
-    .tetris-back-btn:hover {
-      border-color: var(--td-brand-color);
-      color: var(--td-brand-color);
-      background: var(--td-brand-color-light);
-    }
-
-    /* 主区域：屏幕 + 右侧 4 个信息卡 */
-    .tetris-main-area {
-      display: flex;
-      gap: var(--td-size-4);
-      align-items: stretch;
-      margin-bottom: var(--td-size-5);
-    }
-    .tetris-screen {
-      position: relative;
-      flex: 0 0 auto;
-      width: 420px;
-      border: 2px solid var(--td-border-level-2-color);
-      border-radius: var(--td-radius-large);
-      overflow: hidden;
-      background: #0F1419;
-      box-shadow: var(--td-shadow-2);
-    }
-    #tetrisCanvas {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-    .tetris-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 20, 25, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-    .tetris-overlay.hidden {
-      display: none;
-    }
-    .tetris-overlay-content {
-      text-align: center;
-      color: #fff;
-      padding: 0 var(--td-size-4);
-    }
-    .tetris-overlay-content h2 {
-      font-size: var(--td-font-size-headline-small);
-      font-weight: 700;
-      margin-bottom: var(--td-size-3);
-    }
-    .tetris-overlay-content p {
-      font-size: var(--td-font-size-body-medium);
-      opacity: 0.8;
-      margin-bottom: var(--td-size-5);
-    }
-    .tetris-start-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 var(--td-size-7);
-      height: 44px;
-      border: none;
-      border-radius: var(--td-radius-medium);
-      background: var(--td-brand-color);
-      color: #fff;
-      font-size: var(--td-font-size-body-large);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
-    }
-    .tetris-start-btn:hover {
-      background: var(--td-brand-color-hover);
-    }
-    .tetris-start-btn:active {
-      background: var(--td-brand-color-active);
-    }
-
-    /* 右侧信息卡列 */
-    .tetris-side-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: var(--td-size-3);
-      min-width: 0;
-    }
-    .tetris-info-card {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--td-bg-color-container);
-      border: 1px solid var(--td-border-level-2-color);
-      border-radius: var(--td-radius-large);
-      box-shadow: var(--td-shadow-1);
-      padding: var(--td-size-2) var(--td-size-3);
-      min-height: 48px;
-    }
-    .tetris-info-label {
-      font-size: var(--td-font-size-body-small);
-      color: var(--td-text-color-secondary);
-      margin-bottom: var(--td-size-1);
-    }
-    .tetris-info-value {
-      font-size: var(--td-font-size-title-large);
-      font-weight: 700;
-      color: var(--td-brand-color);
-      font-variant-numeric: tabular-nums;
-      line-height: 1.1;
-    }
-    .tetris-pause-card {
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
-      border: 1px solid var(--td-border-level-2-color);
-      font-family: inherit;
-    }
-    .tetris-pause-card:hover {
-      border-color: var(--td-brand-color);
-      background: var(--td-brand-color-light);
-    }
-    .tetris-pause-card:active {
-      background: var(--td-brand-color-1);
-    }
-    .tetris-pause-icon {
-      font-size: 18px;
-      margin-bottom: 2px;
-      color: var(--td-brand-color);
-    }
-    .tetris-pause-text {
-      font-size: var(--td-font-size-body-small);
-      color: var(--td-text-color-primary);
-      font-weight: 500;
-    }
-
-    /* 底部控制区：左侧方向键 + 右侧快速落下 */
-    .tetris-controls-area {
-      display: flex;
-      gap: var(--td-size-4);
-      align-items: stretch;
-      justify-content: space-between;
-      padding: var(--td-size-4);
-      background: var(--td-bg-color-container);
-      border: 1px solid var(--td-border-level-2-color);
-      border-radius: var(--td-radius-large);
-      box-shadow: var(--td-shadow-1);
-    }
-    .tetris-dpad {
-      display: flex;
-      flex-direction: column;
-      gap: var(--td-size-2);
-      flex: 0 0 auto;
-    }
-    .tetris-dpad-row {
-      display: flex;
-      gap: var(--td-size-2);
-      align-items: center;
-      justify-content: center;
-    }
-    .tetris-dpad-cell {
-      width: 64px;
-      height: 64px;
-    }
-    .tetris-circ-btn {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      border: 2px solid var(--td-border-level-2-color);
-      background: var(--td-bg-color-component);
-      color: var(--td-text-color-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s cubic-bezier(0.34, 0.69, 0.1, 1);
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      padding: 0;
-    }
-    .tetris-circ-btn:hover {
-      border-color: var(--td-brand-color);
-      color: var(--td-brand-color);
-    }
-    .tetris-circ-btn:active {
-      background: var(--td-brand-color-light);
-      border-color: var(--td-brand-color);
-      color: var(--td-brand-color);
-      transform: scale(0.95);
-    }
-    .tetris-rotate-btn {
-      color: var(--td-brand-color);
-    }
-    .tetris-drop-btn {
-      flex: 0 0 auto;
-      width: 120px;
-      border-radius: 50%;
-      border: 2px solid var(--td-brand-color);
-      background: var(--td-brand-color-light);
-      color: var(--td-brand-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
-      transition: all 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      aspect-ratio: 1 / 1;
-      align-self: center;
-    }
-    .tetris-drop-btn:hover {
-      background: var(--td-brand-color);
-      color: #fff;
-    }
-    .tetris-drop-btn:active {
-      background: var(--td-brand-color-active);
-      border-color: var(--td-brand-color-active);
-      transform: scale(0.97);
-    }
-    .tetris-drop-icon {
-      font-size: 22px;
-      line-height: 1;
-    }
-    .tetris-drop-text {
-      font-size: 11px;
-      line-height: 1.2;
-    }
-
-    @media(max-width:768px){
-      .game-room-page {
-        padding: var(--td-size-4);
-      }
-      .game-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: var(--td-size-3);
-      }
-      .game-cover {
-        height: 120px;
-      }
-      .tetris-page {
-        padding: var(--td-size-3);
-      }
-      .tetris-top-bar {
-        margin-bottom: var(--td-size-4);
-      }
-      .tetris-title {
-        font-size: var(--td-font-size-title-medium);
-      }
-      .tetris-top-spacer {
-        width: 60px;
-      }
-      .tetris-back-btn {
-        padding: 0 var(--td-size-3);
-        font-size: var(--td-font-size-body-small);
-      }
-      .tetris-main-area {
-        gap: var(--td-size-3);
-        margin-bottom: var(--td-size-4);
-      }
-      .tetris-screen {
-        width: 260px;
-        border-radius: var(--td-radius-medium);
-      }
-      .tetris-info-card {
-        min-height: 50px;
-        padding: var(--td-size-2) var(--td-size-2);
-      }
-      .tetris-info-label {
-        font-size: var(--td-font-size-body-small);
-      }
-      .tetris-info-value {
-        font-size: var(--td-font-size-title-large);
-      }
-      .tetris-pause-icon {
-        font-size: 18px;
-      }
-      .tetris-pause-text {
-        font-size: var(--td-font-size-body-small);
-      }
-      .tetris-controls-area {
-        padding: var(--td-size-3);
-        gap: var(--td-size-3);
-      }
-      .tetris-dpad-cell {
-        width: 52px;
-        height: 52px;
-      }
-      .tetris-circ-btn {
-        width: 52px;
-        height: 52px;
-      }
-      .tetris-circ-btn svg {
-        width: 20px;
-        height: 20px;
-      }
-      .tetris-drop-btn {
-        width: 90px;
-      }
-      .tetris-drop-icon {
-        font-size: 20px;
-      }
-      .tetris-drop-text {
-        font-size: 10px;
-      }
-    }
-
-    @media(max-width:380px){
-      .tetris-screen {
-        width: 200px;
-      }
-      .tetris-info-value {
-        font-size: var(--td-font-size-title-medium);
-      }
-      .tetris-dpad-cell {
-        width: 44px;
-        height: 44px;
-      }
-      .tetris-circ-btn {
-        width: 44px;
-        height: 44px;
-      }
-      .tetris-circ-btn svg {
-        width: 18px;
-        height: 18px;
-      }
-      .tetris-drop-btn {
-        width: 80px;
       }
     }
 
@@ -4025,19 +3656,74 @@
     }
     .site-nav-header {
       margin-bottom: var(--td-size-6);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
     }
-    .site-nav-header h1 {
+    .site-nav-header-left h1 {
       font-size: var(--td-font-size-headline-small);
       font-weight: 600;
       color: var(--text);
       margin-bottom: var(--td-size-2);
     }
-    .site-nav-header p {
+    .site-nav-header-left p {
       font-size: var(--td-font-size-body-medium);
       color: var(--text-secondary);
     }
+    .site-nav-search input {
+      width: 280px;
+      height: 36px;
+      padding: 0 14px;
+      border: 1px solid var(--td-component-border);
+      border-radius: var(--td-radius-default);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .site-nav-search input:focus {
+      border-color: var(--td-brand-color);
+    }
+    .site-nav-search input::placeholder {
+      color: var(--text-placeholder);
+    }
     .site-nav-content {
       width: 100%;
+      display: flex;
+      gap: 32px;
+    }
+    .site-nav-sidebar {
+      width: 160px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 24px;
+      align-self: flex-start;
+    }
+    .site-nav-catelist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .site-nav-catelist li {
+      margin-bottom: 4px;
+    }
+    .site-nav-catelist a {
+      display: block;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: var(--td-radius-default);
+      transition: all 0.2s;
+    }
+    .site-nav-catelist a:hover {
+      color: var(--td-brand-color);
+      background: var(--td-brand-color-light);
+    }
+    .site-nav-main {
+      flex: 1;
+      min-width: 0;
     }
     .site-nav-category {
       margin-bottom: var(--td-size-8);
@@ -6238,23 +5924,37 @@
       <!-- 网站导航页 -->
       <div class="page site-nav-page" id="page-site-nav">
         <div class="site-nav-header">
-          <h1>网站导航</h1>
-          <p>精选优质网站，提升工作效率</p>
+          <div class="site-nav-header-left">
+            <h1>网站导航</h1>
+            <p>精选优质网站，提升工作效率</p>
+          </div>
+          <div class="site-nav-search">
+            <input type="text" id="siteSearchInput" placeholder="搜索站点..." oninput="filterSites(this.value)">
+          </div>
         </div>
 
         <div class="site-nav-content">
-          <div class="site-nav-category">
-            <h2 class="site-nav-category-title">设计资源</h2>
+          <div class="site-nav-sidebar">
+            <ul class="site-nav-catelist">
+              <li><a href="#cat-design-inspiration" onclick="scrollToCategory('cat-design-inspiration')">设计灵感</a></li>
+              <li><a href="#cat-design-software" onclick="scrollToCategory('cat-design-software')">设计软件</a></li>
+              <li><a href="#cat-icons" onclick="scrollToCategory('cat-icons')">图标</a></li>
+              <li><a href="#cat-devtools" onclick="scrollToCategory('cat-devtools')">开发工具</a></li>
+              <li><a href="#cat-utils" onclick="scrollToCategory('cat-utils')">实用工具</a></li>
+              <li><a href="#cat-maps" onclick="scrollToCategory('cat-maps')">地图资源</a></li>
+              <li><a href="#cat-charts" onclick="scrollToCategory('cat-charts')">图表资源</a></li>
+              <li><a href="#cat-image" onclick="scrollToCategory('cat-image')">图片处理</a></li>
+              <li><a href="#cat-design-nav" onclick="scrollToCategory('cat-design-nav')">设计导航</a></li>
+              <li><a href="#cat-mockup" onclick="scrollToCategory('cat-mockup')">样机包装</a></li>
+              <li><a href="#cat-illustration" onclick="scrollToCategory('cat-illustration')">插画</a></li>
+              <li><a href="#cat-qrcode" onclick="scrollToCategory('cat-qrcode')">二维码</a></li>
+              <li><a href="#cat-ai" onclick="scrollToCategory('cat-ai')">AI 工具</a></li>
+            </ul>
+          </div>
+          <div class="site-nav-main">
+          <div class="site-nav-category" id="cat-design-inspiration">
+            <h2 class="site-nav-category-title">设计灵感</h2>
             <div class="site-nav-grid">
-              <a class="site-nav-card site-feature-card" data-site="figma" href="https://www.figma.com" target="_blank" rel="noopener">
-                <div class="site-nav-icon" style="background: #F24E1E;">
-                  <span>F</span>
-                </div>
-                <div class="site-nav-info">
-                  <h3>Figma</h3>
-                  <p>协作式 UI 设计工具</p>
-                </div>
-              </a>
               <a class="site-nav-card site-feature-card" data-site="dribbble" href="https://dribbble.com" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #EA4C89;">
                   <span>D</span>
@@ -6273,6 +5973,63 @@
                   <p>创意作品展示平台</p>
                 </div>
               </a>
+              <a class="site-nav-card site-feature-card" data-site="zcool" href="https://www.zcool.com.cn" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #222222;">
+                  <span>Z</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>站酷</h3>
+                  <p>国内设计师互动平台</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="uicn" href="https://www.ui.cn" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #1890FF;">
+                  <span>UI</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>UI 中国</h3>
+                  <p>中文 UI 设计社区</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="uisdc" href="https://www.uisdc.com" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #FF6A00;">
+                  <span>优</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>优设</h3>
+                  <p>设计资讯与教程平台</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="uinotes" href="https://uinotes.com/" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #722ED1;">
+                  <span>U</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>UINotes</h3>
+                  <p>UI 设计灵感笔记</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="site-nav-category" id="cat-design-software">
+            <h2 class="site-nav-category-title">设计软件</h2>
+            <div class="site-nav-grid">
+              <a class="site-nav-card site-feature-card" data-site="figma" href="https://www.figma.com" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #F24E1E;">
+                  <span>F</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>Figma</h3>
+                  <p>协作式 UI 设计工具</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="site-nav-category" id="cat-icons">
+            <h2 class="site-nav-category-title">图标</h2>
+            <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="iconfont" href="https://www.iconfont.cn" target="_blank" rel="noopener">
                 <div class="site-nav-icon" style="background: #FF6A00;">
                   <span>字</span>
@@ -6294,7 +6051,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-devtools">
             <h2 class="site-nav-category-title">开发工具</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="github" href="https://github.com" target="_blank" rel="noopener">
@@ -6336,7 +6093,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-utils">
             <h2 class="site-nav-category-title">实用工具</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="fuguang" href="https://fg.vkr.me/mac" target="_blank" rel="noopener">
@@ -6351,7 +6108,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-maps">
             <h2 class="site-nav-category-title">地图资源</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="aliyun-datav" href="https://datav.aliyun.com/portal/school/atlas/area_selector" target="_blank" rel="noopener">
@@ -6393,7 +6150,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-charts">
             <h2 class="site-nav-category-title">图表资源</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="echart" href="https://echarts.apache.org/examples/zh/index.html#chart-type-line" target="_blank" rel="noopener">
@@ -6408,7 +6165,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-image">
             <h2 class="site-nav-category-title">图片处理</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="removebg" href="https://www.remove.bg/zh" target="_blank" rel="noopener">
@@ -6468,7 +6225,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-design-nav">
             <h2 class="site-nav-category-title">设计导航</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="uisdc" href="https://hao.uisdc.com/" target="_blank" rel="noopener">
@@ -6519,7 +6276,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-mockup">
             <h2 class="site-nav-category-title">样机包装</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="pacdora" href="https://www.pacdora.cn/" target="_blank" rel="noopener">
@@ -6561,7 +6318,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-illustration">
             <h2 class="site-nav-category-title">插画</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="storytribe" href="https://storytribeapp.com/" target="_blank" rel="noopener">
@@ -6576,7 +6333,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-qrcode">
             <h2 class="site-nav-category-title">二维码</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="cliim" href="https://cli.im/url" target="_blank" rel="noopener">
@@ -6600,7 +6357,7 @@
             </div>
           </div>
 
-          <div class="site-nav-category">
+          <div class="site-nav-category" id="cat-ai">
             <h2 class="site-nav-category-title">AI 工具</h2>
             <div class="site-nav-grid">
               <a class="site-nav-card site-feature-card" data-site="chatgpt" href="https://chat.openai.com" target="_blank" rel="noopener">
@@ -6658,6 +6415,7 @@
                 </div>
               </a>
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -6904,20 +6662,6 @@
         </div>
         <div class="game-room-content">
           <div class="game-grid">
-            <div class="game-card" onclick="switchPage('tetris')">
-              <div class="game-cover tetris-cover">
-                <div class="game-cover-overlay">
-                  <span class="game-play-btn">▶</span>
-                </div>
-              </div>
-              <div class="game-info">
-                <div class="game-title-row">
-                  <h3 class="game-name">俄罗斯方块</h3>
-                  <span class="game-type">休闲益智</span>
-                </div>
-                <p class="game-desc">经典的方块消除游戏，旋转、移动、消除，挑战你的反应速度和策略思维。</p>
-              </div>
-            </div>
             <div class="game-card" onclick="loadBuiltinRom('assets/game-resource/mario-a1.gba', '超级马里奥A1', 'gba', 'GBA')">
               <div class="game-cover">
                 <img src="assets/game-resource/超级马里奥A1.png" alt="超级马里奥A1封面" class="game-cover-img">
@@ -7020,121 +6764,31 @@
         <h1 class="emulator-title" id="emulatorTitle">模拟器</h1>
 
         <div class="emulator-skin">
-          <img src="assets/game-resource/UI/背景@2x.webp" class="skin-bg" alt="">
+          <img src="assets/ui/背景@2x.webp" class="skin-bg" alt="">
 
           <div class="skin-screen" id="emulatorScreen">
             <div id="emulatorGame"></div>
           </div>
 
-          <img src="assets/game-resource/UI/左肩键@2x.webp" class="skin-btn skin-l" data-key="l" alt="L">
-          <img src="assets/game-resource/UI/右肩键@2x.webp" class="skin-btn skin-r" data-key="r" alt="R">
+          <img src="assets/ui/左肩键@2x.webp" class="skin-btn skin-l" data-key="l" alt="L">
+          <img src="assets/ui/右肩键@2x.webp" class="skin-btn skin-r" data-key="r" alt="R">
 
           <div class="skin-dpad" id="skinDpad">
-            <img src="assets/game-resource/UI/方向键@2x.webp" class="dpad-img" alt="方向键">
+            <img src="assets/ui/方向键@2x.webp" class="dpad-img" alt="方向键">
             <div class="dpad-zone dpad-up" data-dir="up"></div>
             <div class="dpad-zone dpad-down" data-dir="down"></div>
             <div class="dpad-zone dpad-left" data-dir="left"></div>
             <div class="dpad-zone dpad-right" data-dir="right"></div>
           </div>
 
-          <img src="assets/game-resource/UI/X@2x.webp" class="skin-btn skin-x" data-key="x" alt="X">
-          <img src="assets/game-resource/UI/Y@2x.webp" class="skin-btn skin-y" data-key="y" alt="Y">
-          <img src="assets/game-resource/UI/A@2x.webp" class="skin-btn skin-a" data-key="a" alt="A">
-          <img src="assets/game-resource/UI/B@2x.webp" class="skin-btn skin-b" data-key="b" alt="B">
+          <img src="assets/ui/X@2x.webp" class="skin-btn skin-x" data-key="x" alt="X">
+          <img src="assets/ui/Y@2x.webp" class="skin-btn skin-y" data-key="y" alt="Y">
+          <img src="assets/ui/A@2x.webp" class="skin-btn skin-a" data-key="a" alt="A">
+          <img src="assets/ui/B@2x.webp" class="skin-btn skin-b" data-key="b" alt="B">
 
-          <img src="assets/game-resource/UI/菜单@2x.webp" class="skin-btn skin-menu" data-key="menu" alt="MENU">
-          <img src="assets/game-resource/UI/选择@2x.webp" class="skin-btn skin-select" data-key="select" alt="SELECT">
-          <img src="assets/game-resource/UI/开始/暂停@2x.webp" class="skin-btn skin-start" data-key="start" alt="START">
-        </div>
-      </div>
-
-      <!-- 俄罗斯方块游戏页面 -->
-      <div class="page tetris-page" id="page-tetris">
-        <div class="tetris-top-bar">
-          <button class="tetris-back-btn" onclick="switchPage('game-room')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            返回
-          </button>
-          <h1 class="tetris-title">俄罗斯方块</h1>
-          <div class="tetris-top-spacer"></div>
-        </div>
-
-        <div class="tetris-main-area">
-          <div class="tetris-screen">
-            <canvas id="tetrisCanvas" width="300" height="600"></canvas>
-            <div class="tetris-overlay" id="tetrisOverlay">
-              <div class="tetris-overlay-content">
-                <h2 id="tetrisOverlayTitle">俄罗斯方块</h2>
-                <p id="tetrisOverlayText">点击开始游戏</p>
-                <button class="tetris-start-btn" onclick="startTetris()">开始游戏</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="tetris-side-panel">
-            <div class="tetris-info-card">
-              <span class="tetris-info-label">得分</span>
-              <span class="tetris-info-value" id="tetrisScore">0</span>
-            </div>
-            <div class="tetris-info-card">
-              <span class="tetris-info-label">等级</span>
-              <span class="tetris-info-value" id="tetrisLevel">1</span>
-            </div>
-            <div class="tetris-info-card">
-              <span class="tetris-info-label">最高分</span>
-              <span class="tetris-info-value" id="tetrisHighScore">0</span>
-            </div>
-            <button class="tetris-info-card tetris-pause-card" onclick="toggleTetrisPause()">
-              <span class="tetris-pause-icon">⏸</span>
-              <span class="tetris-pause-text">暂停</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="tetris-controls-area">
-          <div class="tetris-dpad">
-            <div class="tetris-dpad-row">
-              <div class="tetris-dpad-cell"></div>
-              <button class="tetris-circ-btn tetris-rotate-btn" onclick="tetrisRotate()" aria-label="旋转">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M23 4v6h-6"/>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-                </svg>
-              </button>
-              <div class="tetris-dpad-cell"></div>
-            </div>
-            <div class="tetris-dpad-row">
-              <button class="tetris-circ-btn tetris-left-btn" onclick="tetrisMoveLeft()" aria-label="左移">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M19 12H5"/>
-                  <path d="M12 19l-7-7 7-7"/>
-                </svg>
-              </button>
-              <div class="tetris-dpad-cell"></div>
-              <button class="tetris-circ-btn tetris-right-btn" onclick="tetrisMoveRight()" aria-label="右移">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M5 12h14"/>
-                  <path d="M12 5l7 7-7 7"/>
-                </svg>
-              </button>
-            </div>
-            <div class="tetris-dpad-row">
-              <div class="tetris-dpad-cell"></div>
-              <button class="tetris-circ-btn tetris-down-btn" onclick="tetrisMoveDown()" aria-label="下落">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 5v14"/>
-                  <path d="M19 12l-7 7-7-7"/>
-                </svg>
-              </button>
-              <div class="tetris-dpad-cell"></div>
-            </div>
-          </div>
-          <button class="tetris-drop-btn" onclick="tetrisHardDrop()" aria-label="快速落下">
-            <span class="tetris-drop-icon">⏬</span>
-            <span class="tetris-drop-text">快速落下</span>
-          </button>
+          <img src="assets/ui/菜单@2x.webp" class="skin-btn skin-menu" data-key="menu" alt="MENU">
+          <img src="assets/ui/选择@2x.webp" class="skin-btn skin-select" data-key="select" alt="SELECT">
+          <img src="assets/ui/start/暂停@2x.webp" class="skin-btn skin-start" data-key="start" alt="START">
         </div>
       </div>
 
@@ -7500,6 +7154,10 @@
       figma: 'Figma 是一款基于浏览器的协作式 UI 设计工具，支持多人实时在线协同设计，内置矢量绘图、组件系统、自动布局、原型交互、Dev Mode 代码交付等功能，是当下 UI/UX 设计师的主流生产力工具。',
       dribbble: 'Dribbble 是全球知名的设计师作品展示与灵感发现社区，汇聚海量高质量 UI、插画、品牌、动效设计作品，支持按颜色/标签/类别筛选，提供设计师招聘与作品集展示功能。',
       behance: 'Behance 是 Adobe 旗下创意作品展示平台，覆盖平面、UI、插画、摄影、动效等多领域，支持按项目完整呈现创作过程，设有创意招聘与 Live 直播学习，与 Creative Cloud 无缝衔接。',
+      zcool: '站酷（ZCOOL）是国内知名的设计师互动平台，汇聚插画、UI、平面、三维等多领域原创作品，提供设计大赛、设计师招聘、设计课程等服务，是中文设计师社区的标杆平台。',
+      uicn: 'UI 中国是国内专业的中文 UI 设计社区，聚焦 UI/UX 设计领域，分享优质设计作品、行业资讯、教程干货与设计资源，是国内 UI 设计师交流学习的重要平台。',
+      uisdc: '优设（UISDC）是国内知名的设计资讯与教程平台，精选 UI、平面、动效、产品等设计领域的优质教程、灵感作品与行业文章，是设计师日常充电学习的常用站点。',
+      uinotes: 'UINotes 是 UI 设计灵感笔记平台，收录整理大量移动端 APP UI 设计案例，按组件、风格、行业分类展示，方便 UI 设计师快速查找参考，获取界面设计灵感。',
       iconfont: 'iconfont 是阿里巴巴出品的矢量图标资源平台，收录数百万免费商用矢量图标，支持 SVG/PNG/AI 多格式下载与 iconfont 字体生成，可创建私有图标库团队共享，还提供矢量插画资源。',
       iconsax: 'Iconsax 是高质量矢量图标库，提供 2500+ 精美的线性图标，支持 React、Vue、Flutter 等多种框架，支持自定义颜色与大小，所有图标可免费商用，适合 UI 设计师与开发者使用。',
       // 开发工具
@@ -7611,6 +7269,40 @@
         tooltip.classList.remove('show');
         currentCard = null;
       });
+    }
+
+    // 网站导航 - 站点搜索
+    function filterSites(keyword) {
+      const categories = document.querySelectorAll('.site-nav-category');
+      const kw = keyword.trim().toLowerCase();
+      
+      categories.forEach(cat => {
+        const cards = cat.querySelectorAll('.site-nav-card');
+        let hasVisible = false;
+        
+        cards.forEach(card => {
+          const title = card.querySelector('h3')?.textContent?.toLowerCase() || '';
+          const desc = card.querySelector('p')?.textContent?.toLowerCase() || '';
+          
+          if (!kw || title.includes(kw) || desc.includes(kw)) {
+            card.style.display = '';
+            hasVisible = true;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        cat.style.display = hasVisible ? '' : 'none';
+      });
+    }
+
+    // 网站导航 - 分类平滑滚动
+    function scrollToCategory(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return false;
     }
 
     // 初始化
@@ -8234,11 +7926,6 @@
         }
       }
 
-      // 离开俄罗斯方块页面时暂停游戏
-      if (page !== 'tetris' && typeof window.tetrisPauseIfRunning === 'function') {
-        window.tetrisPauseIfRunning();
-      }
-
       // Page switch logic
       if (page === 'crop') {
         if (typeof window.initCropEditor === 'function') {
@@ -8252,10 +7939,6 @@
         window.udcInit && window.udcInit();
       } else if (page === 'site-nav') {
         initSiteFeatureTooltip();
-      } else if (page === 'tetris') {
-        if (typeof window.tetrisOnPageShow === 'function') {
-          window.tetrisOnPageShow();
-        }
       } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress' && page !== 'convert' && page !== 'video-download' && page !== 'game-room' && page !== 'emulator') {
         showToast(`「${getPageName(page)}」功能开发中...`);
       }
@@ -8587,7 +8270,7 @@
     })();
 
     function getPageName(page) {
-      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', convert: '格式转换', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理', 'video-download': '视频下载', 'game-room': '游戏室', tetris: '俄罗斯方块', emulator: '模拟器' };
+      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', convert: '格式转换', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理', 'video-download': '视频下载', 'game-room': '游戏室', emulator: '模拟器' };
       return names[page] || page;
     }
 
@@ -12087,409 +11770,6 @@
       }
     }).observe(document.body, { childList: true, subtree: true });
 
-    // ========== 俄罗斯方块游戏 ==========
-    (function() {
-      var COLS = 10;
-      var ROWS = 20;
-      var BLOCK_SIZE = 30;
-
-      var canvas, ctx;
-      var board = [];
-      var currentPiece = null;
-      var score = 0;
-      var level = 1;
-      var highScore = 0;
-      var gameLoop = null;
-      var isPaused = false;
-      var isGameOver = false;
-      var dropInterval = 1000;
-
-      function loadHighScore() {
-        try {
-          var saved = localStorage.getItem('tetris_high_score');
-          if (saved) {
-            highScore = parseInt(saved, 10);
-          }
-        } catch (e) {
-          highScore = 0;
-        }
-      }
-
-      function saveHighScore() {
-        try {
-          localStorage.setItem('tetris_high_score', highScore.toString());
-        } catch (e) {}
-      }
-
-      var SHAPES = {
-        I: { shape: [[1,1,1,1]], color: '#00F0F0' },
-        O: { shape: [[1,1],[1,1]], color: '#F0F000' },
-        T: { shape: [[0,1,0],[1,1,1]], color: '#A000F0' },
-        S: { shape: [[0,1,1],[1,1,0]], color: '#00F000' },
-        Z: { shape: [[1,1,0],[0,1,1]], color: '#F00000' },
-        J: { shape: [[1,0,0],[1,1,1]], color: '#0000F0' },
-        L: { shape: [[0,0,1],[1,1,1]], color: '#F0A000' }
-      };
-
-      var SHAPE_NAMES = ['I','O','T','S','Z','J','L'];
-
-      function createBoard() {
-        board = [];
-        for (var r = 0; r < ROWS; r++) {
-          board[r] = [];
-          for (var c = 0; c < COLS; c++) {
-            board[r][c] = null;
-          }
-        }
-      }
-
-      function randomPiece() {
-        var name = SHAPE_NAMES[Math.floor(Math.random() * SHAPE_NAMES.length)];
-        var def = SHAPES[name];
-        return {
-          shape: def.shape.map(function(row) { return row.slice(); }),
-          color: def.color,
-          x: Math.floor((COLS - def.shape[0].length) / 2),
-          y: 0
-        };
-      }
-
-      function rotatePiece(piece) {
-        var rows = piece.shape.length;
-        var cols = piece.shape[0].length;
-        var rotated = [];
-        for (var c = 0; c < cols; c++) {
-          rotated[c] = [];
-          for (var r = rows - 1; r >= 0; r--) {
-            rotated[c].push(piece.shape[r][c]);
-          }
-        }
-        return rotated;
-      }
-
-      function isValidMove(piece, offsetX, offsetY, newShape) {
-        var shape = newShape || piece.shape;
-        var newX = piece.x + offsetX;
-        var newY = piece.y + offsetY;
-
-        for (var r = 0; r < shape.length; r++) {
-          for (var c = 0; c < shape[r].length; c++) {
-            if (!shape[r][c]) continue;
-            var boardX = newX + c;
-            var boardY = newY + r;
-            if (boardX < 0 || boardX >= COLS || boardY >= ROWS) return false;
-            if (boardY >= 0 && board[boardY][boardX]) return false;
-          }
-        }
-        return true;
-      }
-
-      function mergePiece() {
-        for (var r = 0; r < currentPiece.shape.length; r++) {
-          for (var c = 0; c < currentPiece.shape[r].length; c++) {
-            if (currentPiece.shape[r][c]) {
-              var boardY = currentPiece.y + r;
-              var boardX = currentPiece.x + c;
-              if (boardY >= 0) {
-                board[boardY][boardX] = currentPiece.color;
-              }
-            }
-          }
-        }
-      }
-
-      function clearLines() {
-        var linesCleared = 0;
-        for (var r = ROWS - 1; r >= 0; r--) {
-          var full = true;
-          for (var c = 0; c < COLS; c++) {
-            if (!board[r][c]) {
-              full = false;
-              break;
-            }
-          }
-          if (full) {
-            board.splice(r, 1);
-            board.unshift(new Array(COLS).fill(null));
-            linesCleared++;
-            r++;
-          }
-        }
-        if (linesCleared > 0) {
-          var points = [0, 100, 300, 500, 800];
-          score += points[linesCleared] * level;
-          var newLevel = Math.floor(score / 1000) + 1;
-          if (newLevel !== level) {
-            level = newLevel;
-            dropInterval = Math.max(100, 1000 - (level - 1) * 100);
-          }
-          updateScore();
-        }
-      }
-
-      function updateScore() {
-        document.getElementById('tetrisScore').textContent = score;
-        document.getElementById('tetrisLevel').textContent = level;
-        document.getElementById('tetrisHighScore').textContent = highScore;
-      }
-
-      function drawBlock(x, y, color, size, context) {
-        context.fillStyle = color;
-        context.fillRect(x * size, y * size, size - 1, size - 1);
-        context.fillStyle = 'rgba(255,255,255,0.3)';
-        context.fillRect(x * size, y * size, size - 1, 3);
-        context.fillRect(x * size, y * size, 3, size - 1);
-        context.fillStyle = 'rgba(0,0,0,0.2)';
-        context.fillRect(x * size + size - 4, y * size, 3, size - 1);
-        context.fillRect(x * size, y * size + size - 4, size - 1, 3);
-      }
-
-      function draw() {
-        ctx.fillStyle = '#0F1419';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.lineWidth = 1;
-        for (var c = 1; c < COLS; c++) {
-          ctx.beginPath();
-          ctx.moveTo(c * BLOCK_SIZE, 0);
-          ctx.lineTo(c * BLOCK_SIZE, canvas.height);
-          ctx.stroke();
-        }
-        for (var r = 1; r < ROWS; r++) {
-          ctx.beginPath();
-          ctx.moveTo(0, r * BLOCK_SIZE);
-          ctx.lineTo(canvas.width, r * BLOCK_SIZE);
-          ctx.stroke();
-        }
-
-        for (var r = 0; r < ROWS; r++) {
-          for (var c = 0; c < COLS; c++) {
-            if (board[r][c]) {
-              drawBlock(c, r, board[r][c], BLOCK_SIZE, ctx);
-            }
-          }
-        }
-
-        if (currentPiece) {
-          for (var r = 0; r < currentPiece.shape.length; r++) {
-            for (var c = 0; c < currentPiece.shape[r].length; c++) {
-              if (currentPiece.shape[r][c]) {
-                drawBlock(currentPiece.x + c, currentPiece.y + r, currentPiece.color, BLOCK_SIZE, ctx);
-              }
-            }
-          }
-        }
-      }
-
-      function drop() {
-        if (isPaused || isGameOver) return;
-        if (isValidMove(currentPiece, 0, 1)) {
-          currentPiece.y++;
-        } else {
-          mergePiece();
-          clearLines();
-          currentPiece = randomPiece();
-          if (!isValidMove(currentPiece, 0, 0)) {
-            gameOver();
-          }
-        }
-        draw();
-      }
-
-      function gameOver() {
-        isGameOver = true;
-        if (gameLoop) {
-          clearInterval(gameLoop);
-          gameLoop = null;
-        }
-        if (score > highScore) {
-          highScore = score;
-          saveHighScore();
-        }
-        var overlay = document.getElementById('tetrisOverlay');
-        var title = document.getElementById('tetrisOverlayTitle');
-        var text = document.getElementById('tetrisOverlayText');
-        title.textContent = '游戏结束';
-        text.textContent = '最终得分：' + score;
-        overlay.classList.remove('hidden');
-        updateScore();
-        updatePauseUI();
-      }
-
-      function startGame() {
-        createBoard();
-        score = 0;
-        level = 1;
-        dropInterval = 1000;
-        isPaused = false;
-        isGameOver = false;
-        updateScore();
-        currentPiece = randomPiece();
-        draw();
-        updatePauseUI();
-
-        if (gameLoop) clearInterval(gameLoop);
-        gameLoop = setInterval(drop, dropInterval);
-
-        document.getElementById('tetrisOverlay').classList.add('hidden');
-      }
-
-      function updatePauseUI() {
-        var icon = document.querySelector('.tetris-pause-icon');
-        var text = document.querySelector('.tetris-pause-text');
-        if (!icon || !text) return;
-        if (isGameOver) {
-          icon.textContent = '↻';
-          text.textContent = '重新开始';
-        } else if (isPaused) {
-          icon.textContent = '▶';
-          text.textContent = '继续';
-        } else {
-          icon.textContent = '⏸';
-          text.textContent = '暂停';
-        }
-      }
-
-      function togglePause() {
-        if (isGameOver) {
-          startGame();
-          return;
-        }
-        isPaused = !isPaused;
-        var overlay = document.getElementById('tetrisOverlay');
-        var title = document.getElementById('tetrisOverlayTitle');
-        var text = document.getElementById('tetrisOverlayText');
-        if (isPaused) {
-          title.textContent = '已暂停';
-          text.textContent = '按 P 或点击继续';
-          overlay.classList.remove('hidden');
-        } else {
-          overlay.classList.add('hidden');
-        }
-        updatePauseUI();
-      }
-
-      function moveLeft() {
-        if (isPaused || isGameOver) return;
-        if (isValidMove(currentPiece, -1, 0)) {
-          currentPiece.x--;
-          draw();
-        }
-      }
-
-      function moveRight() {
-        if (isPaused || isGameOver) return;
-        if (isValidMove(currentPiece, 1, 0)) {
-          currentPiece.x++;
-          draw();
-        }
-      }
-
-      function moveDown() {
-        if (isPaused || isGameOver) return;
-        if (isValidMove(currentPiece, 0, 1)) {
-          currentPiece.y++;
-          score += 1;
-          updateScore();
-          draw();
-        }
-      }
-
-      function rotate() {
-        if (isPaused || isGameOver) return;
-        var rotated = rotatePiece(currentPiece);
-        if (isValidMove(currentPiece, 0, 0, rotated)) {
-          currentPiece.shape = rotated;
-          draw();
-        } else if (isValidMove(currentPiece, 1, 0, rotated)) {
-          currentPiece.x++;
-          currentPiece.shape = rotated;
-          draw();
-        } else if (isValidMove(currentPiece, -1, 0, rotated)) {
-          currentPiece.x--;
-          currentPiece.shape = rotated;
-          draw();
-        }
-      }
-
-      function hardDrop() {
-        if (isPaused || isGameOver) return;
-        while (isValidMove(currentPiece, 0, 1)) {
-          currentPiece.y++;
-          score += 2;
-        }
-        updateScore();
-        drop();
-      }
-
-      function handleKeydown(e) {
-        var tetrisPage = document.getElementById('page-tetris');
-        if (!tetrisPage.classList.contains('active')) return;
-
-        switch(e.key) {
-          case 'ArrowLeft':
-            e.preventDefault();
-            moveLeft();
-            break;
-          case 'ArrowRight':
-            e.preventDefault();
-            moveRight();
-            break;
-          case 'ArrowDown':
-            e.preventDefault();
-            moveDown();
-            break;
-          case 'ArrowUp':
-            e.preventDefault();
-            rotate();
-            break;
-          case ' ':
-            e.preventDefault();
-            hardDrop();
-            break;
-          case 'p':
-          case 'P':
-            e.preventDefault();
-            togglePause();
-            break;
-        }
-      }
-
-      function initTetris() {
-        canvas = document.getElementById('tetrisCanvas');
-        ctx = canvas.getContext('2d');
-        loadHighScore();
-        createBoard();
-        draw();
-        updateScore();
-        updatePauseUI();
-      }
-
-      window.startTetris = startGame;
-      window.toggleTetrisPause = togglePause;
-      window.tetrisMoveLeft = moveLeft;
-      window.tetrisMoveRight = moveRight;
-      window.tetrisMoveDown = moveDown;
-      window.tetrisRotate = rotate;
-      window.tetrisHardDrop = hardDrop;
-      window.tetrisPauseIfRunning = function() {
-        if (!isPaused && !isGameOver && currentPiece) {
-          togglePause();
-        }
-      };
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-          initTetris();
-          document.addEventListener('keydown', handleKeydown);
-        });
-      } else {
-        initTetris();
-        document.addEventListener('keydown', handleKeydown);
-      }
-    })();
-
     // ========== 游戏导入 & 模拟器逻辑 ==========
     var emulatorLoaderLoaded = false;
     var emulatorBlobUrl = null;
@@ -12581,7 +11861,7 @@
       switchPage('emulator');
 
       var container = document.getElementById('emulatorGame');
-      container.innerHTML = '';
+      container.innerHTML = '<div class="ejs_loading_text">正在加载游戏...</div>';
 
       window.EJS_Buttons = false;
       window.EJS_player = '#emulatorGame';
@@ -12590,6 +11870,7 @@
       window.EJS_startOnLoaded = true;
       window.EJS_language = 'zh-CN';
 
+      var fullUrl = new URL(path, window.location.href).href;
       fetch(encodeURI(path))
         .then(function(res) {
           if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.statusText);
@@ -12602,7 +11883,7 @@
           startEmulator();
         })
         .catch(function(err) {
-          container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;font-size:14px;word-break:break-all;">游戏加载失败：' + err.message + '<br><br>路径: ' + path + '<br>编码: ' + encodeURI(path) + '</div>';
+          container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;font-size:14px;word-break:break-all;">游戏加载失败：' + err.message + '<br><br>路径: ' + path + '<br>完整URL: ' + fullUrl + '</div>';
         });
     }
 
@@ -12618,9 +11899,98 @@
         };
         document.body.appendChild(script);
       } else {
-        if (typeof window.EJS_Boot === 'function') {
-          window.EJS_Boot();
+        if (typeof EmulatorJS === 'function') {
+          var scriptPath = window.EJS_pathtodata || 'assets/emulatorjs/data/';
+          if (!scriptPath.endsWith('/')) scriptPath += '/';
+          
+          var config = {};
+          config.gameUrl = window.EJS_gameUrl;
+          config.dataPath = scriptPath;
+          config.system = window.EJS_core;
+          config.biosUrl = window.EJS_biosUrl;
+          config.gameName = window.EJS_gameName;
+          config.color = window.EJS_color;
+          config.adUrl = window.EJS_AdUrl;
+          config.adMode = window.EJS_AdMode;
+          config.adTimer = window.EJS_AdTimer;
+          config.adSize = window.EJS_AdSize;
+          config.alignStartButton = window.EJS_alignStartButton;
+          config.VirtualGamepadSettings = window.EJS_VirtualGamepadSettings;
+          config.buttonOpts = window.EJS_Buttons;
+          config.volume = window.EJS_volume;
+          config.defaultControllers = window.EJS_defaultControls;
+          config.startOnLoad = window.EJS_startOnLoaded;
+          config.fullscreenOnLoad = window.EJS_fullscreenOnLoaded;
+          config.filePaths = window.EJS_paths;
+          config.loadState = window.EJS_loadStateURL;
+          config.cacheLimit = window.EJS_CacheLimit;
+          config.cheats = window.EJS_cheats;
+          config.defaultOptions = window.EJS_defaultOptions;
+          config.gamePatchUrl = window.EJS_gamePatchUrl;
+          config.gameParentUrl = window.EJS_gameParentUrl;
+          config.netplayUrl = window.EJS_netplayServer;
+          config.gameId = window.EJS_gameID;
+          config.backgroundImg = window.EJS_backgroundImage;
+          config.backgroundBlur = window.EJS_backgroundBlur;
+          config.backgroundColor = window.EJS_backgroundColor;
+          config.controlScheme = window.EJS_controlScheme;
+          config.threads = window.EJS_threads;
+          config.disableCue = window.EJS_disableCue;
+          config.startBtnName = window.EJS_startButtonName;
+          config.softLoad = window.EJS_softLoad;
+          config.capture = window.EJS_screenCapture;
+          config.externalFiles = window.EJS_externalFiles;
+          config.dontExtractBIOS = window.EJS_dontExtractBIOS;
+          config.disableDatabases = window.EJS_disableDatabases;
+          config.disableLocalStorage = window.EJS_disableLocalStorage;
+          config.forceLegacyCores = window.EJS_forceLegacyCores;
+          config.noAutoFocus = window.EJS_noAutoFocus;
+          config.videoRotation = window.EJS_videoRotation;
+          config.hideSettings = window.EJS_hideSettings;
+          config.shaders = Object.assign({}, window.EJS_SHADERS, window.EJS_shaders ? window.EJS_shaders : {});
+
+          if (typeof window.EJS_language === 'string') {
+            config.language = window.EJS_language;
+            try {
+              fetch(scriptPath + 'localization/' + window.EJS_language + '.json')
+                .then(function(res) { return res.text(); })
+                .then(function(text) {
+                  config.langJson = JSON.parse(text);
+                  window.EJS_emulator = new EmulatorJS(window.EJS_player, config);
+                  setupEmulatorEvents();
+                })
+                .catch(function() {
+                  window.EJS_emulator = new EmulatorJS(window.EJS_player, config);
+                  setupEmulatorEvents();
+                });
+              return;
+            } catch(e) {}
+          }
+
+          window.EJS_emulator = new EmulatorJS(window.EJS_player, config);
+          setupEmulatorEvents();
         }
+      }
+    }
+
+    function setupEmulatorEvents() {
+      if (typeof window.EJS_ready === 'function') {
+        window.EJS_emulator.on('ready', window.EJS_ready);
+      }
+      if (typeof window.EJS_onGameStart === 'function') {
+        window.EJS_emulator.on('start', window.EJS_onGameStart);
+      }
+      if (typeof window.EJS_onLoadState === 'function') {
+        window.EJS_emulator.on('loadState', window.EJS_onLoadState);
+      }
+      if (typeof window.EJS_onSaveState === 'function') {
+        window.EJS_emulator.on('saveState', window.EJS_onSaveState);
+      }
+      if (typeof window.EJS_onLoadSave === 'function') {
+        window.EJS_emulator.on('loadSave', window.EJS_onLoadSave);
+      }
+      if (typeof window.EJS_onSaveSave === 'function') {
+        window.EJS_emulator.on('saveSave', window.EJS_onSaveSave);
       }
     }
 
@@ -12638,6 +12008,12 @@
     }
 
     window.EJS_ready = function() {
+      console.log('[Emulator] EJS_ready called');
+      var container = document.getElementById('emulatorGame');
+      var loadingEl = container.querySelector('.ejs_loading_text');
+      if (loadingEl) {
+        loadingEl.textContent = '游戏已就绪，正在启动...';
+      }
       var cleanup = function() {
         var elements = document.querySelectorAll('#emulatorGame .ejs_loading_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
         elements.forEach(function(el) {
