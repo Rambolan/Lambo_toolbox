@@ -1480,6 +1480,15 @@
       max-width: 90% !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
+      transition: opacity 0.3s ease !important;
+    }
+    .emulator-page .ejs_loading_text.ejs_hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+    .emulator-page .custom-loading-text {
+      pointer-events: none;
     }
     .emulator-page .ejs_error_text {
       display: block !important;
@@ -11773,6 +11782,7 @@
     // ========== 游戏导入 & 模拟器逻辑 ==========
     var emulatorLoaderLoaded = false;
     var emulatorBlobUrl = null;
+    var emulatorStarted = false;
 
     var ROM_FORMATS = {
       '.nes':  { core: 'nes',     label: 'FC / NES' },
@@ -11861,7 +11871,7 @@
       switchPage('emulator');
 
       var container = document.getElementById('emulatorGame');
-      container.innerHTML = '<div class="ejs_loading_text">正在加载游戏...</div>';
+      container.innerHTML = '<div class="ejs_loading_text custom-loading-text">正在加载游戏...</div>';
 
       window.EJS_Buttons = false;
       window.EJS_player = '#emulatorGame';
@@ -11869,6 +11879,8 @@
       window.EJS_pathtodata = 'assets/emulatorjs/data/';
       window.EJS_startOnLoaded = true;
       window.EJS_language = 'zh-CN';
+      // 手机上禁用多线程核心，避免 SharedArrayBuffer 兼容性问题
+      window.EJS_threads = false;
 
       var fullUrl = new URL(path, window.location.href).href;
       fetch(encodeURI(path))
@@ -11880,6 +11892,7 @@
           if (blob.size === 0) throw new Error('ROM文件大小为0');
           emulatorBlobUrl = URL.createObjectURL(blob);
           window.EJS_gameUrl = emulatorBlobUrl;
+          startEmulatorLoadTimeout();
           startEmulator();
         })
         .catch(function(err) {
@@ -11888,11 +11901,14 @@
     }
 
     function startEmulator() {
+      if (emulatorStarted) return;
       if (!emulatorLoaderLoaded) {
         var script = document.createElement('script');
-        script.src = 'assets/emulatorjs/data/loader.js?v=2';
+        script.src = 'assets/emulatorjs/data/loader.js?v=' + Date.now();
         script.onload = function() {
           emulatorLoaderLoaded = true;
+          // loader.js 加载完成后需要再次调用 startEmulator 来启动
+          setTimeout(startEmulator, 100);
         };
         script.onerror = function() {
           showToast('模拟器加载失败，请检查网络连接');
@@ -11900,6 +11916,7 @@
         document.body.appendChild(script);
       } else {
         if (typeof EmulatorJS === 'function') {
+          emulatorStarted = true;
           var scriptPath = window.EJS_pathtodata || 'assets/emulatorjs/data/';
           if (!scriptPath.endsWith('/')) scriptPath += '/';
           
@@ -11997,6 +12014,7 @@
     function closeEmulator() {
       var container = document.getElementById('emulatorGame');
       container.innerHTML = '';
+      emulatorStarted = false;
       if (emulatorBlobUrl) {
         URL.revokeObjectURL(emulatorBlobUrl);
         emulatorBlobUrl = null;
@@ -12014,20 +12032,56 @@
       if (loadingEl) {
         loadingEl.textContent = '游戏已就绪，正在启动...';
       }
-      var cleanup = function() {
-        var elements = document.querySelectorAll('#emulatorGame .ejs_loading_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
+      // 在手机等加载较慢设备上，提前触发一次清理（若DOM已存在）
+      setTimeout(function() {
+        var elements = document.querySelectorAll('#emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
         elements.forEach(function(el) {
           el.style.display = 'none';
           el.style.visibility = 'hidden';
           el.style.opacity = '0';
         });
-      };
-      setTimeout(cleanup, 3000);
+      }, 500);
+      setTimeout(function() {
+        var loadingEl2 = container.querySelector('.ejs_loading_text');
+        if (loadingEl2) loadingEl2.classList.add('ejs_hidden');
+      }, 3000);
     };
 
+    // 加载超时提示
+    var emulatorLoadTimeout = null;
+    function startEmulatorLoadTimeout() {
+      clearTimeout(emulatorLoadTimeout);
+      emulatorLoadTimeout = setTimeout(function() {
+        var container = document.getElementById('emulatorGame');
+        var loadingEl = container.querySelector('.custom-loading-text');
+        if (loadingEl) {
+          loadingEl.innerHTML = '游戏加载时间较长，请耐心等待...<br><small>若超过2分钟仍无响应，请刷新页面重试</small>';
+        }
+      }, 45000);
+    }
+    function stopEmulatorLoadTimeout() {
+      clearTimeout(emulatorLoadTimeout);
+    }
+
+    window.addEventListener('error', function(e) {
+      if (e.filename && e.filename.includes('emulatorjs')) {
+        var container = document.getElementById('emulatorGame');
+        if (container) {
+          container.innerHTML = '<div class="ejs_error_text">模拟器加载出错：' + (e.message || '未知错误') + '</div>';
+        }
+      }
+    });
+
     window.EJS_onGameStart = function() {
+      stopEmulatorLoadTimeout();
+      var container = document.getElementById('emulatorGame');
+      var loadingEl = container.querySelector('.ejs_loading_text');
+      if (loadingEl) {
+        loadingEl.classList.add('ejs_hidden');
+        setTimeout(function() { loadingEl.remove(); }, 350);
+      }
       var cleanup = function() {
-        var elements = document.querySelectorAll('#emulatorGame .ejs_loading_text, #emulatorGame .ejs_error_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
+        var elements = document.querySelectorAll('#emulatorGame .ejs_error_text, #emulatorGame .ejs_start_button, #emulatorGame .ejs_game_background');
         elements.forEach(function(el) {
           el.remove();
         });
