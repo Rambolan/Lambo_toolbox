@@ -11908,93 +11908,20 @@
     }
 
     function startEmulator() {
-      if (emulatorStarted) return;
-      if (!emulatorLoaderLoaded) {
-        var script = document.createElement('script');
-        script.src = 'assets/emulatorjs/data/loader.js?v=' + Date.now();
-        script.onload = function() {
-          emulatorLoaderLoaded = true;
-          // loader.js 加载完成后需要再次调用 startEmulator 来启动
-          setTimeout(startEmulator, 100);
-        };
-        script.onerror = function() {
-          showToast('模拟器加载失败，请检查网络连接');
-        };
-        document.body.appendChild(script);
-      } else {
-        if (typeof EmulatorJS === 'function') {
-          emulatorStarted = true;
-          var scriptPath = window.EJS_pathtodata || 'assets/emulatorjs/data/';
-          if (!scriptPath.endsWith('/')) scriptPath += '/';
-          
-          var config = {};
-          config.gameUrl = window.EJS_gameUrl;
-          config.dataPath = scriptPath;
-          config.system = window.EJS_core;
-          config.biosUrl = window.EJS_biosUrl;
-          config.gameName = window.EJS_gameName;
-          config.color = window.EJS_color;
-          config.adUrl = window.EJS_AdUrl;
-          config.adMode = window.EJS_AdMode;
-          config.adTimer = window.EJS_AdTimer;
-          config.adSize = window.EJS_AdSize;
-          config.alignStartButton = window.EJS_alignStartButton;
-          config.VirtualGamepadSettings = window.EJS_VirtualGamepadSettings;
-          config.buttonOpts = window.EJS_Buttons;
-          config.volume = window.EJS_volume;
-          config.defaultControllers = window.EJS_defaultControls;
-          config.startOnLoad = window.EJS_startOnLoaded;
-          config.fullscreenOnLoad = window.EJS_fullscreenOnLoaded;
-          config.filePaths = window.EJS_paths;
-          config.loadState = window.EJS_loadStateURL;
-          config.cacheLimit = window.EJS_CacheLimit;
-          config.cheats = window.EJS_cheats;
-          config.defaultOptions = window.EJS_defaultOptions;
-          config.gamePatchUrl = window.EJS_gamePatchUrl;
-          config.gameParentUrl = window.EJS_gameParentUrl;
-          config.netplayUrl = window.EJS_netplayServer;
-          config.gameId = window.EJS_gameID;
-          config.backgroundImg = window.EJS_backgroundImage;
-          config.backgroundBlur = window.EJS_backgroundBlur;
-          config.backgroundColor = window.EJS_backgroundColor;
-          config.controlScheme = window.EJS_controlScheme;
-          config.threads = window.EJS_threads;
-          config.disableCue = window.EJS_disableCue;
-          config.startBtnName = window.EJS_startButtonName;
-          config.softLoad = window.EJS_softLoad;
-          config.capture = window.EJS_screenCapture;
-          config.externalFiles = window.EJS_externalFiles;
-          config.dontExtractBIOS = window.EJS_dontExtractBIOS;
-          config.disableDatabases = window.EJS_disableDatabases;
-          config.disableLocalStorage = window.EJS_disableLocalStorage;
-          config.forceLegacyCores = window.EJS_forceLegacyCores;
-          config.noAutoFocus = window.EJS_noAutoFocus;
-          config.videoRotation = window.EJS_videoRotation;
-          config.hideSettings = window.EJS_hideSettings;
-          config.shaders = Object.assign({}, window.EJS_SHADERS, window.EJS_shaders ? window.EJS_shaders : {});
-
-          if (typeof window.EJS_language === 'string') {
-            config.language = window.EJS_language;
-            try {
-              fetch(scriptPath + 'localization/' + window.EJS_language + '.json')
-                .then(function(res) { return res.text(); })
-                .then(function(text) {
-                  config.langJson = JSON.parse(text);
-                  window.EJS_emulator = new EmulatorJS(window.EJS_player, config);
-                  setupEmulatorEvents();
-                })
-                .catch(function() {
-                  window.EJS_emulator = new EmulatorJS(window.EJS_player, config);
-                  setupEmulatorEvents();
-                });
-              return;
-            } catch(e) {}
-          }
-
-          window.EJS_emulator = new EmulatorJS(window.EJS_player, config);
-          setupEmulatorEvents();
+      console.log('[Emulator] startEmulator called');
+      var script = document.createElement('script');
+      script.src = 'assets/emulatorjs/data/loader.js?v=' + Date.now();
+      script.onload = function() {
+        console.log('[Emulator] loader.js loaded');
+      };
+      script.onerror = function() {
+        console.error('[Emulator] loader.js load failed');
+        var container = document.getElementById('emulatorGame');
+        if (container) {
+          container.innerHTML = '<div class="ejs_error_text">模拟器加载失败：无法加载 loader.js<br><br>请检查网络连接或刷新页面</div>';
         }
-      }
+      };
+      document.body.appendChild(script);
     }
 
     function setupEmulatorEvents() {
