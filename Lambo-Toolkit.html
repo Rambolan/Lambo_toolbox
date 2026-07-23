@@ -11883,21 +11883,28 @@
       window.EJS_threads = false;
 
       var fullUrl = new URL(path, window.location.href).href;
-      fetch(encodeURI(path))
-        .then(function(res) {
-          if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + res.statusText);
-          return res.blob();
-        })
-        .then(function(blob) {
-          if (blob.size === 0) throw new Error('ROM文件大小为0');
-          emulatorBlobUrl = URL.createObjectURL(blob);
-          window.EJS_gameUrl = emulatorBlobUrl;
-          startEmulatorLoadTimeout();
-          startEmulator();
-        })
-        .catch(function(err) {
-          container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;font-size:14px;word-break:break-all;">游戏加载失败：' + err.message + '<br><br>路径: ' + path + '<br>完整URL: ' + fullUrl + '</div>';
-        });
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', encodeURI(path), true);
+      xhr.responseType = 'blob';
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          var blob = xhr.response;
+          if (blob && blob.size > 0) {
+            emulatorBlobUrl = URL.createObjectURL(blob);
+            window.EJS_gameUrl = emulatorBlobUrl;
+            startEmulatorLoadTimeout();
+            startEmulator();
+          } else {
+            container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;font-size:14px;word-break:break-all;">游戏加载失败：ROM文件大小为0<br><br>路径: ' + path + '<br>完整URL: ' + fullUrl + '</div>';
+          }
+        } else {
+          container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;font-size:14px;word-break:break-all;">游戏加载失败：HTTP ' + xhr.status + ' ' + xhr.statusText + '<br><br>路径: ' + path + '<br>完整URL: ' + fullUrl + '</div>';
+        }
+      };
+      xhr.onerror = function() {
+        container.innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;font-size:14px;word-break:break-all;">游戏加载失败：网络请求错误<br><br>路径: ' + path + '<br>完整URL: ' + fullUrl + '<br><br>请检查网络连接或尝试刷新页面</div>';
+      };
+      xhr.send();
     }
 
     function startEmulator() {
