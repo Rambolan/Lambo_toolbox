@@ -5958,6 +5958,8 @@
               <li><a href="#cat-illustration" onclick="scrollToCategory('cat-illustration')">插画</a></li>
               <li><a href="#cat-qrcode" onclick="scrollToCategory('cat-qrcode')">二维码</a></li>
               <li><a href="#cat-ai" onclick="scrollToCategory('cat-ai')">AI 工具</a></li>
+              <li><a href="#cat-3d" onclick="scrollToCategory('cat-3d')">3D</a></li>
+              <li><a href="#cat-motion" onclick="scrollToCategory('cat-motion')">动效</a></li>
             </ul>
           </div>
           <div class="site-nav-main">
@@ -6031,6 +6033,42 @@
                 <div class="site-nav-info">
                   <h3>Figma</h3>
                   <p>协作式 UI 设计工具</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="mastergo" href="https://mastergo.com/" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #6C5CE7;">
+                  <span>MG</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>MasterGo</h3>
+                  <p>企业级 AI 设计平台</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="jsdesign" href="https://js.design/" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #FF6B5A;">
+                  <span>JS</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>即时设计</h3>
+                  <p>国产云端 UI 设计工具</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="ardot" href="https://ardot.tencent.com/" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #1479FF;">
+                  <span>Ar</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>Ardot</h3>
+                  <p>腾讯 AI 设计智能体</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="pixso" href="https://pixso.cn/" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #7C3AED;">
+                  <span>Px</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>Pixso</h3>
+                  <p>产品设计协作一体化</p>
                 </div>
               </a>
             </div>
@@ -6112,6 +6150,15 @@
                 <div class="site-nav-info">
                   <h3>浮光</h3>
                   <p>Mac 实用工具合集</p>
+                </div>
+              </a>
+              <a class="site-nav-card site-feature-card" data-site="qq-browser-tool" href="https://tool.browser.qq.com/?" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #12B7F5;">
+                  <span>QQ</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>QQ浏览器工具箱</h3>
+                  <p>在线实用工具合集</p>
                 </div>
               </a>
             </div>
@@ -6421,6 +6468,36 @@
                 <div class="site-nav-info">
                   <h3>星流</h3>
                   <p>AI 图像生成工具</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="site-nav-category" id="cat-3d">
+            <h2 class="site-nav-category-title">3D</h2>
+            <div class="site-nav-grid">
+              <a class="site-nav-card site-feature-card" data-site="anatomyatelier" href="https://anatomyatelier.vercel.app" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #635BFF;">
+                  <span>3D</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>Anatomy Atelier</h3>
+                  <p>3D 人体解剖模型</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="site-nav-category" id="cat-motion">
+            <h2 class="site-nav-category-title">动效</h2>
+            <div class="site-nav-grid">
+              <a class="site-nav-card site-feature-card" data-site="reactbits" href="https://reactbits.dev/" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #61DAFB;">
+                  <span>⚛</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>ReactBits</h3>
+                  <p>现代 Web 动效与组件</p>
                 </div>
               </a>
             </div>
@@ -7159,8 +7236,12 @@
 
     // 设计资源 - 功能介绍简单 Tooltip
     const siteFeatureData = {
-      // 设计资源
+      // 设计软件
       figma: 'Figma 是一款基于浏览器的协作式 UI 设计工具，支持多人实时在线协同设计，内置矢量绘图、组件系统、自动布局、原型交互、Dev Mode 代码交付等功能，是当下 UI/UX 设计师的主流生产力工具。',
+      mastergo: 'MasterGo 是蓝湖团队推出的企业级 AI 设计平台，支持多人实时协作、AI 智能布局与素材填充、组件系统与设计规范管理、高保真原型交互、Figma 文件导入；内置 MasterGo AI 可基于设计系统文生 UI、生成生产级前端代码，并通过 MCP 协议让 AI 直接操作画布，支持私有化部署。',
+      jsdesign: '即时设计是国内首款专业级在线 UI 设计工具，支持网页/macOS/Windows/Linux/iOS/Android/微信小程序全平台覆盖。提供精细化矢量设计、多人实时协作、原型交互动画、自动布局、切图标注交付等完整产研工作流；内置即时 AI 可自然语言生成可编辑 UI 稿，配套资源社区海量模板与插件，个人与中小团队基础功能永久免费。',
+      ardot: '腾讯设计 Ardot 是腾讯自研的 AI 设计智能体平台，支持文生 UI、图片转可编辑设计稿、局部智能修改、批量生成矢量图标、基于业务组件库生成规范设计稿；通过 MCP 协议直连 CodeBuddy、Cursor 等 IDE 实现设计一键转代码；支持 Figma 文件完整导入、多人实时协作与企业级安全管理，注册即享 1000 Credits 免费额度。',
+      pixso: 'Pixso 是博思云创出品的新一代产品设计协作一体化工具，集白板、原型、UI 设计、交互演示、研发模式于一体。支持多人实时协作、组件变体与自动布局、Figma/Sketch/XD 文件互通、设计稿转鸿蒙 ArkUI/HTML/Flutter 代码；内置 AI 智能体辅助界面创作，支持私有化部署与企业级数据安全，个人基础功能免费使用。',
       dribbble: 'Dribbble 是全球知名的设计师作品展示与灵感发现社区，汇聚海量高质量 UI、插画、品牌、动效设计作品，支持按颜色/标签/类别筛选，提供设计师招聘与作品集展示功能。',
       behance: 'Behance 是 Adobe 旗下创意作品展示平台，覆盖平面、UI、插画、摄影、动效等多领域，支持按项目完整呈现创作过程，设有创意招聘与 Live 直播学习，与 Creative Cloud 无缝衔接。',
       zcool: '站酷（ZCOOL）是国内知名的设计师互动平台，汇聚插画、UI、平面、三维等多领域原创作品，提供设计大赛、设计师招聘、设计课程等服务，是中文设计师社区的标杆平台。',
@@ -7176,6 +7257,7 @@
       mdn: 'MDN Web Docs 是 Mozilla 维护的权威 Web 开发文档，覆盖 HTML、CSS、JavaScript、Web API 等前端技术，提供详尽的 API 参考与教程，是 Web 开发者最信赖的官方文档。',
       // 实用工具
       fuguang: '浮光是一款 Mac 实用工具合集，汇集多种常用小工具与效率功能，帮助 Mac 用户一站式解决日常使用中的各类需求。',
+      'qq-browser-tool': 'QQ浏览器工具箱是腾讯推出的在线实用工具合集，提供图片处理、文档转换、文本提取、加密解密、二维码生成等多种工具，免安装即开即用，适合日常办公与开发场景。',
       // 地图资源
       'aliyun-datav': '阿里云 DataV 数据可视化平台提供中国省市行政区 GeoJSON 与 SVG 地图数据下载，支持精确到县级的行政区划边界，是制作中国地图可视化项目的必备数据源。',
       'echarts-map': 'ECharts Map 是基于 ECharts 的中国地图扩展工具，提供县乡镇街道级精细 SVG 地图数据下载，支持行政区划层级钻取，适合制作细颗粒度地区分布图。',
@@ -7212,7 +7294,11 @@
       notion: 'Notion 是集笔记、文档、数据库、看板、Wiki 于一体的 AI 工作空间，支持团队协作与知识管理，内置 AI 助手可辅助写作、总结、查询，是高效办公的全能工具。',
       canva: 'Canva 是在线设计平台，提供海报、PPT、社媒封面、名片等海量模板，拖拽式编辑零门槛上手，配合 AI 设计助手与丰富素材库，适合非专业用户快速制作设计作品。',
       cocoloop: 'CocoLoop 是当贝推出的 OpenClaw 类 AI Agent 技能商店，提供 AI 技能获取、安全审核与集成服务，帮助开发者快速接入与分发 AI Agent 能力。',
-      xingliu: '星流是 AI 图像生成工具，基于自研大模型提供文字生成图像服务，支持多种艺术风格与场景生成，适合设计师、内容创作者快速产出高质量视觉素材。'
+      xingliu: '星流是 AI 图像生成工具，基于自研大模型提供文字生成图像服务，支持多种艺术风格与场景生成，适合设计师、内容创作者快速产出高质量视觉素材。',
+      // 3D
+      anatomyatelier: 'Anatomy Atelier 是 3D 人体解剖模型展示平台，提供高精度可交互的三维人体结构模型，支持旋转、缩放、分层查看骨骼、肌肉、器官等系统，适合医学学习、艺术创作与角色建模参考。',
+      // 动效
+      reactbits: 'ReactBits 是一个高质量的 React 动效与 UI 组件库，提供背景特效、文字动效、按钮动画、卡片组件、AI 工具组件等丰富示例，每个组件都附带完整可复制的源码与演示，适合开发者为项目快速添加精致交互动效。'
     };
 
     function initSiteFeatureTooltip() {

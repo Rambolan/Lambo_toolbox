@@ -21,6 +21,10 @@ node_modules/
 
 # Backup files
 *-backup.*
+*.bak
+*.esm
+*.map
+*.zip
 
 # OS files
 .DS_Store
