@@ -3656,6 +3656,63 @@
       to { transform: rotate(360deg); }
     }
 
+    /* === 漫画下载页 Comic Download === */
+    .comic-download-page {
+      padding: var(--td-size-6);
+      padding-bottom: var(--td-size-10);
+    }
+    .comic-summary {
+      margin-top: var(--td-size-5);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--td-radius-large);
+      padding: var(--td-size-4) var(--td-size-5);
+      display: flex;
+      align-items: center;
+      gap: var(--td-size-3);
+      flex-wrap: wrap;
+    }
+    .comic-summary-name {
+      font-size: var(--td-font-size-body-large);
+      font-weight: 600;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .comic-summary-meta {
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-muted);
+    }
+    .comic-summary-badge {
+      font-size: 12px;
+      color: var(--td-brand-color);
+      background: var(--td-brand-color-1);
+      padding: 2px 8px;
+      border-radius: var(--td-radius-small);
+    }
+    .comic-download-actions {
+      display: flex;
+      gap: var(--td-size-3);
+      margin-top: var(--td-size-5);
+      flex-wrap: wrap;
+    }
+    .comic-download-actions .vd-btn { flex: 1; min-width: 200px; }
+    .comic-chapter-download-bar {
+      margin-top: var(--td-size-4);
+      background: var(--td-bg-color-component);
+      border-radius: var(--td-radius-medium);
+      padding: var(--td-size-3) var(--td-size-4);
+      font-size: var(--td-font-size-body-small);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      word-break: break-all;
+    }
+    .comic-tips li { padding-left: var(--td-size-4); }
+    @media (max-width: 768px) {
+      .comic-download-page { padding: var(--td-size-4); padding-bottom: 80px; }
+      .comic-download-actions { flex-direction: column; }
+      .comic-download-actions .vd-btn { width: 100%; min-width: 0; }
+    }
+
     /* === Site Nav Page === */
     .site-nav-page {
       padding: var(--td-size-6) !important;
@@ -5329,6 +5386,20 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" data-page="comic-download" href="javascript:void(0)" onclick="switchPage('comic-download')">
+            <span class="nav-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <circle cx="15.5" cy="8.5" r="1.5"/>
+                <path d="M7 15h10"/>
+                <path d="M9 18c.6-1 1.5-1.5 2.5-1.5s1.9.5 2.5 1.5"/>
+              </svg>
+            </span>
+            漫画下载
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" data-page="game-room" href="javascript:void(0)" onclick="switchPage('game-room')">
             <span class="nav-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -5855,6 +5926,84 @@
           </div>
         </div>
       </div><!-- /video-download-page -->
+
+      <!-- 漫画下载页 -->
+      <div class="page comic-download-page" id="page-comic-download">
+        <div class="vd-header">
+          <h1>漫画下载</h1>
+          <p>输入漫画阅读页链接 · 自动解析当前页图片 · 合并下载为 PDF</p>
+        </div>
+
+        <div class="vd-content">
+          <div class="vd-input-card">
+            <div class="vd-input-wrap">
+              <textarea
+                id="comicUrlInput"
+                class="vd-url-input"
+                placeholder="粘贴漫画「章节阅读页」链接&#10;例如：https://www.90mh.cc/manhua/zujienvyou/155192.html&#10;自动解析该页面里的所有漫画图片"
+                rows="3"
+              ></textarea>
+              <button class="vd-clear-btn" id="comicClearBtn" onclick="clearComicInput()" title="清空">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div class="vd-action-row">
+              <div class="vd-paste-hint">
+                <kbd>Ctrl/⌘ + V</kbd> 粘贴链接，或直接输入
+              </div>
+              <div class="vd-action-btns">
+                <button class="vd-btn vd-btn-ghost" onclick="pasteComicUrl()">粘贴链接</button>
+                <button class="vd-btn vd-btn-primary" id="comicParseBtn" onclick="parseComicPage()">解析当前页</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 解析结果摘要 -->
+          <div class="comic-summary" id="comicSummary" style="display:none;">
+            <span class="comic-summary-badge">漫画</span>
+            <span class="comic-summary-name" id="comicName"></span>
+            <span class="comic-summary-meta" id="comicMeta"></span>
+          </div>
+
+          <!-- 下载操作 -->
+          <div class="comic-download-actions" id="comicDownloadActions" style="display:none;">
+            <button class="vd-btn vd-btn-primary" onclick="comicDownloadPdf()">
+              下载为 PDF
+            </button>
+            <button class="vd-btn" id="comicCancelBtn" onclick="comicCancel()" style="display:none;">取消</button>
+          </div>
+
+          <div class="vd-status" id="comicStatus" style="display:none;">
+            <div class="vd-status-icon" id="comicStatusIcon"></div>
+            <div class="vd-status-text" id="comicStatusText"></div>
+          </div>
+
+          <div class="vd-progress" id="comicProgress" style="display:none;">
+            <div class="vd-progress-header">
+              <span id="comicProgressText">准备中...</span>
+              <span class="vd-progress-percent" id="comicProgressPercent">0%</span>
+            </div>
+            <div class="vd-progress-bar">
+              <div class="vd-progress-fill" id="comicProgressFill"></div>
+            </div>
+            <div class="comic-chapter-download-bar" id="comicSubProgress" style="display:none;"></div>
+          </div>
+
+          <div class="vd-tips comic-tips">
+            <div class="vd-tips-title">使用说明</div>
+            <ul class="vd-tips-list">
+              <li>支持 <code>90mh.cc</code> 的章节阅读页链接（如 <code>/manhua/xxx/123.html</code>）</li>
+              <li>输入链接后点「解析当前页」，会自动识别该页面的所有漫画图片并显示数量</li>
+              <li>确认后点「下载为 PDF」，图片会按顺序合并生成一个 PDF 文件</li>
+              <li>部分图源受跨域限制，工具会自动通过公共 CORS 代理获取，速度取决于图源与代理服务器</li>
+              <li>若长时间无进度，可能是代理失效或网络波动，可点击「取消」后重试</li>
+            </ul>
+          </div>
+        </div>
+      </div><!-- /comic-download-page -->
 
       <!-- 长宽比例换算页 -->
       <div class="page ratio-page" id="page-ratio">
@@ -6470,6 +6619,15 @@
                   <p>AI 图像生成工具</p>
                 </div>
               </a>
+              <a class="site-nav-card site-feature-card" data-site="aixc4d" href="https://www.aixc4d.com/?category=software&subcategory=ai-skills&sort=recommended#asset-catalog" target="_blank" rel="noopener">
+                <div class="site-nav-icon" style="background: #6F42C1;">
+                  <span>AI</span>
+                </div>
+                <div class="site-nav-info">
+                  <h3>积木岛 AI</h3>
+                  <p>AI 技能资源目录</p>
+                </div>
+              </a>
             </div>
           </div>
 
@@ -6969,6 +7127,12 @@
         </a>
       </li>
       <li class="bottom-nav-item">
+        <a class="bottom-nav-link" data-bpage="comic-download" href="javascript:void(0)" onclick="switchPage('comic-download')">
+          <span class="bottom-nav-icon">📚</span>
+          漫画下载
+        </a>
+      </li>
+      <li class="bottom-nav-item">
         <a class="bottom-nav-link" data-bpage="game-room" href="javascript:void(0)" onclick="switchPage('game-room')">
           <span class="bottom-nav-icon">🎮</span>
           游戏室
@@ -7295,6 +7459,7 @@
       canva: 'Canva 是在线设计平台，提供海报、PPT、社媒封面、名片等海量模板，拖拽式编辑零门槛上手，配合 AI 设计助手与丰富素材库，适合非专业用户快速制作设计作品。',
       cocoloop: 'CocoLoop 是当贝推出的 OpenClaw 类 AI Agent 技能商店，提供 AI 技能获取、安全审核与集成服务，帮助开发者快速接入与分发 AI Agent 能力。',
       xingliu: '星流是 AI 图像生成工具，基于自研大模型提供文字生成图像服务，支持多种艺术风格与场景生成，适合设计师、内容创作者快速产出高质量视觉素材。',
+      aixc4d: '积木岛 AI 是一个 AI 技能与资源导航目录，汇集各类 AI 软件、Agent 技能、插件与模型资源，支持按分类与推荐排序浏览，帮助用户快速发现与获取 AI 生产力工具。',
       // 3D
       anatomyatelier: 'Anatomy Atelier 是 3D 人体解剖模型展示平台，提供高精度可交互的三维人体结构模型，支持旋转、缩放、分层查看骨骼、肌肉、器官等系统，适合医学学习、艺术创作与角色建模参考。',
       // 动效
@@ -8034,7 +8199,7 @@
         window.udcInit && window.udcInit();
       } else if (page === 'site-nav') {
         initSiteFeatureTooltip();
-      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress' && page !== 'convert' && page !== 'video-download' && page !== 'game-room' && page !== 'emulator') {
+      } else if (page !== 'counter' && page !== 'home' && page !== 'ratio' && page !== 'calc' && page !== 'code-compare' && page !== 'compress' && page !== 'convert' && page !== 'video-download' && page !== 'comic-download' && page !== 'game-room' && page !== 'emulator') {
         showToast(`「${getPageName(page)}」功能开发中...`);
       }
     }
@@ -8364,8 +8529,320 @@
       }
     })();
 
+    // ========== Comic Download Module (90mh) ==========
+    (function() {
+      const PROXIES = [
+        url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+        url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+        url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+      ];
+
+      const $ = (id) => document.getElementById(id);
+      let currentImages = [];   // 当前解析出的图片地址
+      let comicName = '';
+      let chapterName = '';
+      let stopToken = null;     // { aborted: boolean }
+      let busy = false;
+
+      // ---------- 网络工具 ----------
+      function buildAttempts(url) {
+        return [url, ...PROXIES.map(fn => fn(url))];
+      }
+      async function fetchOne(url, isBinary) {
+        let lastErr = null;
+        for (const u of buildAttempts(url)) {
+          if (stopToken && stopToken.aborted) throw new Error('已取消');
+          try {
+            const r = await fetch(u, { mode: 'cors' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return isBinary ? await r.blob() : await r.text();
+          } catch (e) { lastErr = e; }
+        }
+        throw new Error('网络请求失败（可能代理失效）：' + url);
+      }
+
+      // ---------- 解析当前页面 ----------
+      function parsePageImages(html) {
+        const m = html.match(/var chapterImages\s*=\s*(\[[\s\S]*?\]);/);
+        if (!m) throw new Error('未能从该页面解析出漫画图片');
+        let arr = [];
+        try { arr = JSON.parse(m[1]); } catch (e) {
+          // 容错：手动提取字符串
+          arr = (m[1].match(/"((?:[^"\\]|\\.)*)"/g) || []).map(s => JSON.parse(s));
+        }
+        return arr.filter(s => typeof s === 'string' && s.startsWith('http'));
+      }
+      function deriveNames(html) {
+        let chapter = '', comic = '';
+        const pm = html.match(/var pageTitle\s*=\s*"([^"]*)"/);
+        if (pm && pm[1]) {
+          const parts = pm[1].split(' - ').map(s => s.trim()).filter(Boolean);
+          chapter = parts[0] || '';
+          comic = parts[1] || '';
+        }
+        if (!comic) {
+          const tm = html.match(/<title>([^<]+)/);
+          if (tm) comic = tm[1].split(' - ')[0].trim();
+        }
+        return { comic, chapter };
+      }
+
+      // ---------- 图片加载 → JPEG ----------
+      function loadImageToJpeg(blob) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const w = img.naturalWidth, h = img.naturalHeight;
+              const canvas = document.createElement('canvas');
+              canvas.width = w; canvas.height = h;
+              canvas.getContext('2d').drawImage(img, 0, 0);
+              canvas.toBlob(async (jpegBlob) => {
+                try {
+                  const ab = await jpegBlob.arrayBuffer();
+                  URL.revokeObjectURL(url);
+                  resolve({ jpeg: new Uint8Array(ab), w, h });
+                } catch (e) { URL.revokeObjectURL(url); reject(e); }
+              }, 'image/jpeg', 0.92);
+            } catch (e) { URL.revokeObjectURL(url); reject(e); }
+          };
+          img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('图片解码失败')); };
+          img.src = url;
+        });
+      }
+
+      // ---------- 简易 PDF 生成器（图片 → PDF） ----------
+      function PdfWriter() {
+        this.chunks = [];
+        this.pos = 0;
+        this.offsetByNum = {};
+        this.maxObj = 2; // 1=catalog, 2=pages
+        this.pageObjNums = [];
+        this._emit('%PDF-1.4\n'); // PDF 文件头
+      }
+      PdfWriter.prototype._emit = function(str) {
+        const bytes = new TextEncoder().encode(str);
+        this.chunks.push(bytes);
+        this.pos += bytes.length;
+      };
+      PdfWriter.prototype._emitBytes = function(bytes) {
+        this.chunks.push(bytes);
+        this.pos += bytes.length;
+      };
+      PdfWriter.prototype._beginObj = function(num) {
+        this.offsetByNum[num] = this.pos;
+        this._emit(num + ' 0 obj\n');
+      };
+      PdfWriter.prototype.addImagePage = function(jpeg, w, h) {
+        const scale = Math.min(1, 900 / Math.max(w, h));
+        const pw = Math.round(w * scale), ph = Math.round(h * scale);
+
+        const contentNum = ++this.maxObj;
+        const imgNum = ++this.maxObj;
+        const pageNum = ++this.maxObj;
+
+        const content = 'q\n' + pw + ' 0 0 ' + ph + ' 0 0 cm\n/Im0 Do\nQ\n';
+        const contentBytes = new TextEncoder().encode(content);
+
+        this._beginObj(contentNum);
+        this._emit('<< /Length ' + contentBytes.length + ' >>\nstream\n');
+        this._emitBytes(contentBytes);
+        this._emit('endstream\nendobj\n');
+
+        this._beginObj(imgNum);
+        this._emit('<< /Type /XObject /Subtype /Image /Width ' + w + ' /Height ' + h
+          + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jpeg.length + ' >>\nstream\n');
+        this._emitBytes(jpeg);
+        this._emit('endstream\nendobj\n');
+
+        this._beginObj(pageNum);
+        this._emit('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pw + ' ' + ph + ']'
+          + ' /Resources << /XObject << /Im0 ' + imgNum + ' 0 R >> >>'
+          + ' /Contents ' + contentNum + ' 0 R >>\nendobj\n');
+
+        this.pageObjNums.push(pageNum);
+      };
+      PdfWriter.prototype.finish = function() {
+        // pages
+        this.offsetByNum[2] = this.pos;
+        this._emit('2 0 obj\n<< /Type /Pages /Kids [' + this.pageObjNums.map(n => n + ' 0 R').join(' ') + '] /Count ' + this.pageObjNums.length + ' >>\nendobj\n');
+        // catalog
+        this.offsetByNum[1] = this.pos;
+        this._emit('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+
+        const size = this.maxObj + 1;
+        let xref = 'xref\n0 ' + size + '\n0000000000 65535 f \n';
+        for (let i = 1; i < size; i++) {
+          xref += String(this.offsetByNum[i] || 0).padStart(10, '0') + ' 00000 n \n';
+        }
+        this._emit(xref);
+
+        const startPos = this.pos;
+        this._emit('trailer\n<< /Size ' + size + ' /Root 1 0 R >>\nstartxref\n' + startPos + '\n%%EOF\n');
+
+        const merged = new Uint8Array(this.pos);
+        let off = 0;
+        for (const c of this.chunks) { merged.set(c, off); off += c.length; }
+        return new Blob([merged], { type: 'application/pdf' });
+      };
+
+      // ---------- 工具 ----------
+      function safeName(s) {
+        return String(s || '').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 80) || 'comic';
+      }
+      function saveBlob(blob, name) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }
+
+      // ---------- UI ----------
+      function showStatus(type, msg) {
+        const box = $('comicStatus');
+        const icon = $('comicStatusIcon');
+        const text = $('comicStatusText');
+        const icons = { info: 'ℹ', warning: '⚠', error: '✕', success: '✓' };
+        box.className = 'vd-status ' + type;
+        box.style.display = 'flex';
+        icon.textContent = icons[type] || '';
+        text.textContent = msg;
+      }
+      function hideStatus() { $('comicStatus').style.display = 'none'; }
+      function setProgress(ratio, text, subText) {
+        const pct = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+        $('comicProgress').style.display = 'block';
+        $('comicProgressText').textContent = text;
+        $('comicProgressPercent').textContent = pct + '%';
+        $('comicProgressFill').style.width = pct + '%';
+        const sub = $('comicSubProgress');
+        if (subText) { sub.style.display = 'block'; sub.textContent = subText; }
+        else { sub.style.display = 'none'; sub.textContent = ''; }
+      }
+      function hideProgress() {
+        $('comicProgress').style.display = 'none';
+        $('comicProgressFill').style.width = '0';
+        $('comicProgressPercent').textContent = '0%';
+        $('comicSubProgress').style.display = 'none';
+        $('comicSubProgress').textContent = '';
+      }
+      function setRunning(running) {
+        busy = running;
+        $('comicParseBtn').disabled = running;
+        $('comicCancelBtn').style.display = running ? 'inline-flex' : 'none';
+        if (running) { hideStatus(); $('comicProgress').style.display = 'block'; }
+      }
+
+      function bindComicInput() {
+        const input = $('comicUrlInput');
+        if (!input) return;
+        input.addEventListener('input', () => {
+          $('comicClearBtn').classList.toggle('show', input.value.trim().length > 0);
+          hideStatus();
+        });
+        input.addEventListener('keydown', (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); parseComicPage(); }
+        });
+      }
+
+      // ---------- 对外 API ----------
+      window.clearComicInput = function() {
+        $('comicUrlInput').value = '';
+        $('comicClearBtn').classList.remove('show');
+        $('comicSummary').style.display = 'none';
+        $('comicDownloadActions').style.display = 'none';
+        hideStatus();
+        $('comicUrlInput').focus();
+      };
+      window.pasteComicUrl = async function() {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            $('comicUrlInput').value = text.trim();
+            $('comicClearBtn').classList.add('show');
+            hideStatus();
+            showToast('已粘贴剪贴板内容');
+          } else { showToast('剪贴板为空'); }
+        } catch (e) { showToast('无法读取剪贴板，请手动粘贴'); $('comicUrlInput').focus(); }
+      };
+
+      // 解析当前页面：抓取图片列表
+      window.parseComicPage = async function() {
+        if (busy) return;
+        const url = ($('comicUrlInput').value || '').trim();
+        hideStatus();
+        $('comicSummary').style.display = 'none';
+        $('comicDownloadActions').style.display = 'none';
+        if (!url) { showStatus('warning', '请先粘贴或输入漫画阅读页链接'); return; }
+        let u;
+        try { u = new URL(url); } catch (e) { showStatus('error', '链接格式不正确'); return; }
+        if (u.protocol !== 'http:' && u.protocol !== 'https:') { showStatus('error', '仅支持 http/https 链接'); return; }
+
+        setRunning(true);
+        stopToken = { aborted: false };
+        try {
+          setProgress(0.05, '正在解析当前页面图集...', url);
+          const html = await fetchOne(url, false);
+          const images = parsePageImages(html);
+          if (!images.length) throw new Error('未在该页面中发现漫画图片，请确认是 90mh 的阅读页链接');
+          const names = deriveNames(html);
+          comicName = names.comic || '漫画';
+          chapterName = names.chapter || '';
+          currentImages = images;
+          $('comicName').textContent = comicName + (chapterName ? ' · ' + chapterName : '');
+          $('comicMeta').textContent = '共 ' + images.length + ' 张图片';
+          $('comicSummary').style.display = 'flex';
+          $('comicDownloadActions').style.display = 'flex';
+          hideProgress();
+          showStatus('success', '解析成功，检测到 ' + images.length + ' 张图片，可点击「下载为 PDF」');
+        } catch (e) {
+          hideProgress();
+          showStatus('error', '解析失败：' + e.message);
+        } finally { setRunning(false); }
+      };
+
+      // 下载 PDF：按顺序合并当前页全部图片
+      window.comicDownloadPdf = async function() {
+        if (busy) return;
+        if (!currentImages.length) { showStatus('warning', '请先点击「解析当前页」'); return; }
+        setRunning(true);
+        stopToken = { aborted: false };
+        const writer = new PdfWriter();
+        const total = currentImages.length;
+        try {
+          for (let i = 0; i < total; i++) {
+            if (stopToken.aborted) break;
+            setProgress((i / total) * 0.97, '正在下载图片 ' + (i + 1) + '/' + total, currentImages[i]);
+            const blob = await fetchOne(currentImages[i], true);
+            const p = await loadImageToJpeg(blob);
+            writer.addImagePage(p.jpeg, p.w, p.h);
+          }
+          if (stopToken.aborted) { showStatus('warning', '已取消下载'); return; }
+          setProgress(1, '正在生成 PDF...');
+          const fnameParts = [comicName, chapterName || ('第' + (currentImages.length) + '页')];
+          saveBlob(writer.finish(), safeName(fnameParts.join('-')) + '.pdf');
+          showStatus('success', '下载完成，PDF 已生成并下载');
+          showToast('PDF 已生成并下载');
+        } catch (e) {
+          if (stopToken && stopToken.aborted) showStatus('warning', '已取消下载');
+          else { showStatus('error', '下载失败：' + e.message); showToast('下载失败，请稍后重试'); }
+        } finally { setRunning(false); hideProgress(); }
+      };
+      window.comicCancel = function() {
+        if (stopToken) stopToken.aborted = true;
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindComicInput);
+      } else { bindComicInput(); }
+    })();
+
     function getPageName(page) {
-      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', convert: '格式转换', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理', 'video-download': '视频下载', 'game-room': '游戏室', emulator: '模拟器' };
+      const names = { counter: '文字统计', home: '投喂', crop: '图片裁剪', cutout: '抠图', compress: '图片压缩', convert: '格式转换', ratio: '长宽比例换算', calc: '计算器', 'site-nav': '网站导航', review: 'UI 设计走查', 'image-compare': '图片比对', 'code-compare': '代码比对', image: '图片处理', 'video-download': '视频下载', 'comic-download': '漫画下载', 'game-room': '游戏室', emulator: '模拟器' };
       return names[page] || page;
     }
 
